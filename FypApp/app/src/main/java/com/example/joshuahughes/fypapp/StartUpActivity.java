@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import java.io.InputStream;
+import java.net.URL;
+
 public class StartUpActivity extends AppCompatActivity {
 
     protected Intent intent;
@@ -67,4 +70,6 @@ public class StartUpActivity extends AppCompatActivity {
         return (networkInfo != null && networkInfo.isConnectedOrConnecting());
 
     }
+
+
 }
