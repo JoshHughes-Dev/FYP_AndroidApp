@@ -4,4 +4,6 @@
     <string name="temp_device_connected">device connected</string>
     <string name="loadingProgress_NoInternetMessage">You dont have an internet connection, the app will run in offline mode (limiting features) until the device can re-connect</string>
     <string name="title_activity_dash_board">DashBoardActivity</string>
+    <string name="baseUrl">http://co-web-1.lboro.ac.uk/cojh5web/api</string>
+    <string name="crimeLocationTypesCall">/crimelocation</string>
 </resources>

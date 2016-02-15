@@ -1,8 +1,11 @@
 package com.example.joshuahughes.fypapp;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +16,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class StartUpActivity extends AppCompatActivity {
 
@@ -23,14 +28,21 @@ public class StartUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        isConnected = isConnected();
 
         intent = new Intent(this, DashBoardActivity.class);
 
+        isConnected = isConnected();
+
         if (isConnected) {
-            VolleyTest();
-        } else {
-            FinishStartup(null);
+            GetCrimeLocationTypesJson();
+
+        } else if(isDataInStorage()) {
+            FinishStartup();
+
+        } else{
+            //uh oh
+            Log.d("StartUp_log", "no connection and no storage");
+            createDialog();
         }
     }
 
@@ -43,40 +55,85 @@ public class StartUpActivity extends AppCompatActivity {
 
     }
 
-    private void VolleyTest() {
-        //RequestQueue queue = Volley.newRequestQueue(this);
+    private void GetCrimeLocationTypesJson() {
 
-        final String url = "http://co-web-1.lboro.ac.uk/cojh5web/api/crimelocation";
+
+        final String url =  getString(R.string.baseUrl) + getString(R.string.crimeLocationTypesCall);
+
 
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d("Response", response.toString());
-
-                        FinishStartup(response);
-                    }
-                }, new Response.ErrorListener() {
+            new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d("StartUp_log", response.toString());
+                    StoreJsonArray(response);
+                    FinishStartup();
+                }
+            },
+            new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.d("Error.Response", error.toString());
+                    Log.d("StartUp_log", error.toString());
+                    FinishStartup();
                 }
             }
         );
 
+        //RequestQueue queue = Volley.newRequestQueue(this);
         //queue.add(getRequest);
         MySingleton.getInstance(this).addToRequestQueue(getRequest);
     }
 
 
-    private void FinishStartup(JSONArray jsonArray) {
-        if(jsonArray != null){
-            intent.putExtra("crimeLocationTypes", jsonArray.toString());
-        }
+    private void FinishStartup(){
+
         intent.putExtra("isConnected", isConnected);
         startActivity(intent);
-
+        Log.d("Startup_log", "StartUp finished");
         finish();
+    }
+
+    private void StoreJsonArray(JSONArray jsonArray){
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("ClrArray", jsonArray);
+
+        } catch (JSONException e){
+
+            Log.d("StartUp_log", e.toString());
+        }
+
+        SharedPreferences settings = getSharedPreferences("CrimeLocationTypesJSON", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("crimeLocationTypesJson", jsonObject.toString());
+        editor.commit();
+
+    }
+
+    private Boolean isDataInStorage(){
+        SharedPreferences settings = getSharedPreferences("CrimeLocationTypesJSON", 0);
+        return settings.contains("crimeLocationTypesJson");
+    }
+
+    private void createDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("App requires internet connection for first use, please relaunch app when connected to the internet");
+        builder.setCancelable(false);
+        builder.setPositiveButton(
+                "Exit",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        System.exit(0);
+                    }
+                }
+        );
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 }

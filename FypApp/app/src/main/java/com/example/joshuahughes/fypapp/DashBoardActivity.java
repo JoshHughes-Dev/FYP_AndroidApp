@@ -1,17 +1,23 @@
 package com.example.joshuahughes.fypapp;
 
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.DialogPreference;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class DashBoardActivity extends AppCompatActivity {
 
@@ -24,15 +30,14 @@ public class DashBoardActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        String jsonString = intent.getStringExtra("crimeLocationTypes");
+        String jsonString = GetCrimeLocationTypesFromStorage().toString();
         TextView textview = (TextView)findViewById(R.id.textView2);
         textview.setText(jsonString);
 
-        Boolean isConnected = intent.getExtras().getBoolean("isConnected");
+        CreateListView(GetCrimeLocationTypesFromStorage());
 
+        Boolean isConnected = intent.getExtras().getBoolean("isConnected");
         if(!isConnected){
-            TextView textview0 =  (TextView)findViewById(R.id.textView);
-            textview0.setText("OFFLINE MODE");
             createOfflineModeDialog();
         }
     }
@@ -54,6 +59,76 @@ public class DashBoardActivity extends AppCompatActivity {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private JSONArray GetCrimeLocationTypesFromStorage(){
+
+        SharedPreferences settings = getSharedPreferences("CrimeLocationTypesJSON", 0);
+        String strJson = settings.getString("crimeLocationTypesJson", "0");
+
+        JSONArray jsonArray = new JSONArray();
+        JSONObject tempObject;
+
+        if(strJson != null){
+            try {
+                tempObject = new JSONObject(strJson);
+
+                try{
+                    jsonArray = tempObject.getJSONArray("ClrArray");
+
+                } catch (JSONException e){
+                    Log.d("JSONArray", e.toString());
+                }
+
+            } catch (JSONException e){
+                Log.d("JSONobject", e.toString());
+            }
+
+        }
+
+        return jsonArray;
+    }
+
+
+    private void CreateListView(JSONArray jsonArray){
+
+        ListView listView = (ListView) findViewById(R.id.listView);
+        CLAdapter adapter = new CLAdapter(DashBoardActivity.this, jsonArray);
+
+
+        listView.setAdapter(adapter);
+    }
+
+
+    private class CLAdapter extends JSONAdapter {
+
+
+        public CLAdapter(Activity activity, JSONArray jsonArray){
+            super(activity,jsonArray);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null)
+                convertView = activity.getLayoutInflater().inflate(R.layout.row, null);
+
+            TextView text = (TextView) convertView.findViewById(R.id.label);
+
+
+            JSONObject json_data = getItem(position);
+            if (null != json_data) {
+                try {
+                    String jj = json_data.getString("name");
+                    text.setText(jj);
+
+                } catch (JSONException e) {
+                    Log.d("BLARDGGH", e.toString());
+                }
+
+            }
+            return convertView;
+        }
+
     }
 
 }
