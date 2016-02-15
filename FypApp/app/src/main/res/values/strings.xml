@@ -6,4 +6,5 @@
     <string name="title_activity_dash_board">DashBoardActivity</string>
     <string name="baseUrl">http://co-web-1.lboro.ac.uk/cojh5web/api</string>
     <string name="crimeLocationTypesCall">/crimelocation</string>
+    <string name="crimeLocationTypesListHeader">Crime-Location Types</string>
 </resources>
