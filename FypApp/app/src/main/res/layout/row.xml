@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:orientation="horizontal"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -27,6 +27,7 @@
         android:src="@drawable/ic_info_24dp"
         android:contentDescription=""
         android:layout_gravity="center_vertical"
-        android:background="@color/transparent"/>
+
+        android:id="@+id/cltInfoButton"/>
 
 </LinearLayout>

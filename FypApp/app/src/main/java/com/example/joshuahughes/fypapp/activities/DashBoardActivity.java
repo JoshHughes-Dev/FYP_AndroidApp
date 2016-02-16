@@ -1,4 +1,4 @@
-package com.example.joshuahughes.fypapp;
+package com.example.joshuahughes.fypapp.activities;
 
 
 import android.app.Activity;
@@ -14,8 +14,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.joshuahughes.fypapp.adapters.ClTypesListAdapter;
+import com.example.joshuahughes.fypapp.adapters.JSONAdapter;
+import com.example.joshuahughes.fypapp.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,7 +91,7 @@ public class DashBoardActivity extends AppCompatActivity {
                 tempObject = new JSONObject(strJson);
 
                 try{
-                    jsonArray = tempObject.getJSONArray("ClrArray");
+                    jsonArray = tempObject.getJSONArray(getString(R.string.ClTypesStorage));
 
                 } catch (JSONException e){
                     Log.d("JSONArray", e.toString());
@@ -104,42 +110,13 @@ public class DashBoardActivity extends AppCompatActivity {
     private void CreateListView(JSONArray jsonArray){
 
         ListView listView = (ListView) findViewById(R.id.listView);
-        CLAdapter adapter = new CLAdapter(DashBoardActivity.this, jsonArray);
-
+        ClTypesListAdapter adapter = new ClTypesListAdapter(DashBoardActivity.this, jsonArray);
 
         listView.setAdapter(adapter);
-    }
-
-
-    private class CLAdapter extends JSONAdapter {
-
-
-        public CLAdapter(Activity activity, JSONArray jsonArray){
-            super(activity,jsonArray);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null)
-                convertView = activity.getLayoutInflater().inflate(R.layout.row, null);
-
-            TextView text = (TextView) convertView.findViewById(R.id.label);
-
-
-            JSONObject json_data = getItem(position);
-            if (null != json_data) {
-                try {
-                    String jj = json_data.getString("name");
-                    text.setText(jj);
-
-                } catch (JSONException e) {
-                    Log.d("BLARDGGH", e.toString());
-                }
-
-            }
-            return convertView;
-        }
 
     }
+
+
+
 
 }

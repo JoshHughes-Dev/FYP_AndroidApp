@@ -1,4 +1,4 @@
-package com.example.joshuahughes.fypapp;
+package com.example.joshuahughes.fypapp.activities;
 
 
 import android.app.AlertDialog;
@@ -15,6 +15,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.VolleyQueue;
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,14 +39,10 @@ public class StartUpActivity extends AppCompatActivity {
 
         if (isConnected) {
             GetCrimeLocationTypesJson();
-
         } else if(isDataInStorage()) {
             FinishStartup();
-
         } else{
-            //uh oh
-            Log.d("StartUp_log", "no connection and no storage");
-            createDialog();
+            unableToLaunchDialog();
         }
     }
 
@@ -59,7 +59,6 @@ public class StartUpActivity extends AppCompatActivity {
 
 
         final String url =  getString(R.string.baseUrl) + getString(R.string.crimeLocationTypesCall);
-
 
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
             new Response.Listener<JSONArray>() {
@@ -79,9 +78,7 @@ public class StartUpActivity extends AppCompatActivity {
             }
         );
 
-        //RequestQueue queue = Volley.newRequestQueue(this);
-        //queue.add(getRequest);
-        MySingleton.getInstance(this).addToRequestQueue(getRequest);
+        VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
 
@@ -89,7 +86,6 @@ public class StartUpActivity extends AppCompatActivity {
 
         intent.putExtra("isConnected", isConnected);
         startActivity(intent);
-        Log.d("Startup_log", "StartUp finished");
         finish();
     }
 
@@ -97,7 +93,7 @@ public class StartUpActivity extends AppCompatActivity {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("ClrArray", jsonArray);
+            jsonObject.put(getString(R.string.ClTypesStorage), jsonArray);
 
         } catch (JSONException e){
 
@@ -116,7 +112,8 @@ public class StartUpActivity extends AppCompatActivity {
         return settings.contains("crimeLocationTypesJson");
     }
 
-    private void createDialog(){
+    private void unableToLaunchDialog(){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage("App requires internet connection for first use, please relaunch app when connected to the internet");

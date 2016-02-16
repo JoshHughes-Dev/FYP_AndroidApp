@@ -10,15 +10,17 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
 /**
- * Created by joshuahughes on 12/02/16.
+ * Created by joshuahughes on 16/02/16.
+ * Singleton instance of volley request queue thats persistent throughout application (across activities)
  */
-public class MySingleton {
-    private static MySingleton mInstance;
+public class VolleyQueue {
+
+    private static VolleyQueue mInstance;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
     private static Context mCtx;
 
-    private MySingleton(Context context) {
+    private VolleyQueue(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 
@@ -39,9 +41,9 @@ public class MySingleton {
                 });
     }
 
-    public static synchronized MySingleton getInstance(Context context) {
+    public static synchronized VolleyQueue getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new MySingleton(context);
+            mInstance = new VolleyQueue(context);
         }
         return mInstance;
     }
