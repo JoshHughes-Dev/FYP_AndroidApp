@@ -18,11 +18,14 @@ import android.widget.TextView;
 import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter;
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -47,7 +50,7 @@ public class DashBoardActivity extends AppCompatActivity {
         TextView textview = (TextView)findViewById(R.id.textView2);
         textview.setText(jsonString);
 
-        ArrayList<CrimeLocationTypeModel> clTarray = createCLTarray(GetCrimeLocationTypesFromStorage());
+        ArrayList<CrimeLocationTypeModel> clTarray = createCLTarray(jsonString);
         
         CreateRecyclerView(clTarray);
 
@@ -129,17 +132,14 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
 
-    private ArrayList<CrimeLocationTypeModel> createCLTarray(JSONArray jsonArray){
+    private ArrayList<CrimeLocationTypeModel> createCLTarray(String jsonArray){
         ArrayList<CrimeLocationTypeModel> crimeLocationTypeModelArrayList = new ArrayList<>();
 
-        for(int i = 0; i< jsonArray.length(); i++){
-            try {
-                crimeLocationTypeModelArrayList.add(new CrimeLocationTypeModel(jsonArray.getJSONObject(i)));
-            }
-            catch(JSONException e){
+        Gson gson = new Gson();
 
-            }
-        }
+        Type arrayType = new TypeToken<ArrayList<CrimeLocationTypeModel>>() {}.getType();
+        crimeLocationTypeModelArrayList = gson.fromJson(jsonArray,arrayType);
+        
 
         return crimeLocationTypeModelArrayList;
     }
