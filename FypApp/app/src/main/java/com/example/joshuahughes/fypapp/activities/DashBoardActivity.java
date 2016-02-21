@@ -1,33 +1,37 @@
 package com.example.joshuahughes.fypapp.activities;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.joshuahughes.fypapp.adapters.ClTypesListAdapter;
-import com.example.joshuahughes.fypapp.adapters.JSONAdapter;
+import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter;
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class DashBoardActivity extends AppCompatActivity {
+
+
+    protected RecyclerView mRecyclerView;
+    protected CrimeLocationTypesAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +47,16 @@ public class DashBoardActivity extends AppCompatActivity {
         TextView textview = (TextView)findViewById(R.id.textView2);
         textview.setText(jsonString);
 
-        CreateListView(GetCrimeLocationTypesFromStorage());
+        ArrayList<CrimeLocationTypeModel> clTarray = createCLTarray(GetCrimeLocationTypesFromStorage());
+        
+        CreateRecyclerView(clTarray);
+
 
         Boolean isConnected = intent.getExtras().getBoolean("isConnected");
         if(!isConnected){
             createOfflineModeDialog();
         }
+
     }
 
     @Override
@@ -107,16 +115,34 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
 
-    private void CreateListView(JSONArray jsonArray){
+    private void CreateRecyclerView(ArrayList<CrimeLocationTypeModel> clTypesArray){
 
-        ListView listView = (ListView) findViewById(R.id.listView);
-        ClTypesListAdapter adapter = new ClTypesListAdapter(DashBoardActivity.this, jsonArray);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        listView.setAdapter(adapter);
-
+        mRecyclerView.setHasFixedSize(true);
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        // specify an adapter (see also next example)
+        mAdapter = new CrimeLocationTypesAdapter(clTypesArray);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
 
+    private ArrayList<CrimeLocationTypeModel> createCLTarray(JSONArray jsonArray){
+        ArrayList<CrimeLocationTypeModel> crimeLocationTypeModelArrayList = new ArrayList<>();
+
+        for(int i = 0; i< jsonArray.length(); i++){
+            try {
+                crimeLocationTypeModelArrayList.add(new CrimeLocationTypeModel(jsonArray.getJSONObject(i)));
+            }
+            catch(JSONException e){
+
+            }
+        }
+
+        return crimeLocationTypeModelArrayList;
+    }
 
 
 }
