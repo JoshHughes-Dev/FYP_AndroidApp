@@ -33,7 +33,16 @@
             android:name=".activities.SavedRequestsActivity"
             android:label="@string/title_activity_saved_requests"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.BaseActivity"></activity>
+        <activity android:name=".activities.BaseActivity" />
+        <activity
+            android:name=".activities.MapSearchActivity"
+            android:label="@string/title_activity_map_search"
+            android:parentActivityName=".activities.DashBoardActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.joshuahughes.fypapp.activities.DashBoardActivity" />
+        </activity>
     </application>
 
 </manifest>

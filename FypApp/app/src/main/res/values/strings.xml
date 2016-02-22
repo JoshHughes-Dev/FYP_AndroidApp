@@ -12,5 +12,6 @@
     <string name="crimeLocationTypesCall">/crimelocation</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_saved_requests">SavedRequestsActivity</string>
+    <string name="title_activity_map_search">MapSearchActivity</string>
 
 </resources>

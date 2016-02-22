@@ -58,7 +58,7 @@ public class DashBoardActivity extends BaseActivity {
         //sets toolbar view for activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(R.string.app_name);
+        setTitle(R.string.app_name);
 
         Intent intent = getIntent();
 
@@ -71,11 +71,12 @@ public class DashBoardActivity extends BaseActivity {
         CreateListView(clTypesArray);
         //CreateRecyclerView(clTypesArray);
 
-
-        Boolean isConnected = intent.getExtras().getBoolean("isConnected");
-        if(!isConnected){
-            createOfflineModeDialog();
+        if(intent.hasExtra("isConnected")){
+            if(!intent.getExtras().getBoolean("isConnected")){
+                createOfflineModeDialog();
+            }
         }
+
 
     }
 
@@ -131,7 +132,12 @@ public class DashBoardActivity extends BaseActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("LIST_ITEM_CLICKED", clTypesArray.get(position).Name.toString());
+
+                CrimeLocationTypeModel selectedModel = clTypesArray.get(position);
+                Log.d("LIST_ITEM_CLICKED", selectedModel.Name.toString());
+                Intent intent = new Intent(DashBoardActivity.this, MapSearchActivity.class);
+                intent.putExtra("selectedCrimeLocationType",selectedModel);
+                startActivity(intent);
             }
         });
     }
