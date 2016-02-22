@@ -10,5 +10,7 @@
     <!-- API -->
     <string name="baseUrl">http://co-web-1.lboro.ac.uk/cojh5web/api</string>
     <string name="crimeLocationTypesCall">/crimelocation</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_saved_requests">SavedRequestsActivity</string>
 
 </resources>

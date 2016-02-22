@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.SimpleDividerItemDecoration;
@@ -62,11 +63,34 @@ public class DashBoardActivity extends AppCompatActivity {
 
     }
 
+    //SETS options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+
+        Intent intent;
+
+        switch(item.getItemId()){
+            case R.id.about:
+                intent = new Intent(this, AboutActivity.class);
+                this.startActivity(intent);
+                break;
+            case R.id.savedRequests:
+                //intent = new Intent(this, null);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+        return true;
+
     }
 
 
