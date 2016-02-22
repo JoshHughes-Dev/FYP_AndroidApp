@@ -7,11 +7,13 @@
     android:layout_height="72dp"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants">
+
 
     <TextView
         android:id="@+id/clTypeName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
         android:layout_weight="1"/>
@@ -21,6 +23,8 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_info_24dp"
         android:contentDescription=""
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:layout_gravity="center_vertical"
         android:id="@+id/clTypeInfoButton"/>
 

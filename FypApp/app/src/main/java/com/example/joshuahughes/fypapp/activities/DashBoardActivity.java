@@ -11,14 +11,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.joshuahughes.fypapp.RecyclerItemClickListener;
 import com.example.joshuahughes.fypapp.SimpleDividerItemDecoration;
 import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter;
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter2;
 import com.example.joshuahughes.fypapp.helpers.StorageHelper;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.google.gson.Gson;
@@ -31,18 +38,27 @@ import java.util.ArrayList;
 
 
 public class DashBoardActivity extends BaseActivity {
-    
-    protected RecyclerView mRecyclerView;
-    protected CrimeLocationTypesAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+
+    //protected RecyclerView mRecyclerView;
+    //protected CrimeLocationTypesAdapter mAdapter;
+    //private RecyclerView.LayoutManager mLayoutManager;
+
+    protected ListView mListView;
+    protected CrimeLocationTypesAdapter2 mAdapter2;
+
+
+    protected ArrayList<CrimeLocationTypeModel> clTypesArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //sets content view for activity
         setContentView(R.layout.activity_dash_board);
+        //sets toolbar view for activity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.app_name);
 
         Intent intent = getIntent();
 
@@ -50,9 +66,10 @@ public class DashBoardActivity extends BaseActivity {
         TextView textview = (TextView)findViewById(R.id.textView2);
         textview.setText(jsonString);
 
-        ArrayList<CrimeLocationTypeModel> clTarray = createCLTarray(jsonString);
-        
-        CreateRecyclerView(clTarray);
+        clTypesArray = createCLTarray(jsonString);
+
+        CreateListView(clTypesArray);
+        //CreateRecyclerView(clTypesArray);
 
 
         Boolean isConnected = intent.getExtras().getBoolean("isConnected");
@@ -84,18 +101,39 @@ public class DashBoardActivity extends BaseActivity {
     }
 
 
-    private void CreateRecyclerView(ArrayList<CrimeLocationTypeModel> clTypesArray){
+//    private void CreateRecyclerView(final ArrayList<CrimeLocationTypeModel> clTypesArray){
+//
+//        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+//
+//        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(DashBoardActivity.this));
+//        mRecyclerView.setHasFixedSize(true);
+//        // use a linear layout manager
+//        mLayoutManager = new LinearLayoutManager(this);
+//        mRecyclerView.setLayoutManager(mLayoutManager);
+//        // specify an adapter (see also next example)
+//        mAdapter = new CrimeLocationTypesAdapter(clTypesArray);
+//        mRecyclerView.setAdapter(mAdapter);
+//        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener(){
+//                @Override
+//                public void onItemClick(View view, int position){
+//                    Log.d("RECYCLER_ITEM_CLICKED", clTypesArray.get(position).Name.toString());
+//                }
+//            })
+//        );
+//    }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(DashBoardActivity.this));
-        mRecyclerView.setHasFixedSize(true);
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        // specify an adapter (see also next example)
-        mAdapter = new CrimeLocationTypesAdapter(clTypesArray);
-        mRecyclerView.setAdapter(mAdapter);
+    private void CreateListView(final ArrayList<CrimeLocationTypeModel> clTypesArray){
+
+        mListView = (ListView)findViewById(R.id.listView);
+        mAdapter2 = new CrimeLocationTypesAdapter2(this,clTypesArray);
+        mListView.setAdapter(mAdapter2);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("LIST_ITEM_CLICKED", clTypesArray.get(position).Name.toString());
+            }
+        });
     }
 
 

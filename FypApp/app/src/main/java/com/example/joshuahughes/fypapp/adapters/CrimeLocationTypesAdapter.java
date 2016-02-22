@@ -3,6 +3,7 @@ package com.example.joshuahughes.fypapp.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.activities.DashBoardActivity;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
  */
 public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocationTypesAdapter.ViewHolder> {
     private ArrayList<CrimeLocationTypeModel> clTypesArray;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -35,6 +38,7 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
 
             textView = (TextView) v.findViewById(R.id.clTypeName);
             imageButton = (ImageButton) v.findViewById(R.id.clTypeInfoButton);
+
         }
 
         public TextView getTextView() {
@@ -43,6 +47,7 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
         public ImageButton getImageButton(){
             return imageButton;
         }
+
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
@@ -88,7 +93,6 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
     }
 
 
-
     private void cltInfoDialog(Context context, CrimeLocationTypeModel model){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -110,4 +114,7 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+
+
 }
