@@ -11,6 +11,4 @@
     <string name="baseUrl">http://co-web-1.lboro.ac.uk/cojh5web/api</string>
     <string name="crimeLocationTypesCall">/crimelocation</string>
 
-    <!-- Storage -->
-    <string name="ClTypesStorage">ClTypesArray</string>
 </resources>

@@ -17,11 +17,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.VolleyQueue;
-
+import com.example.joshuahughes.fypapp.helpers.StorageHelper;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 
 public class StartUpActivity extends AppCompatActivity {
 
@@ -32,17 +31,16 @@ public class StartUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         intent = new Intent(this, DashBoardActivity.class);
 
         isConnected = isConnected();
 
         if (isConnected) {
             GetCrimeLocationTypesJson();
-        } else if(isDataInStorage()) {
+        } else if(StorageHelper.isClTypesDataInSharedPref(StartUpActivity.this)) {
             FinishStartup();
         } else{
-            unableToLaunchDialog();
+            UnableToLaunchDialog();
         }
     }
 
@@ -57,7 +55,6 @@ public class StartUpActivity extends AppCompatActivity {
 
     private void GetCrimeLocationTypesJson() {
 
-
         final String url =  getString(R.string.baseUrl) + getString(R.string.crimeLocationTypesCall);
 
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
@@ -65,7 +62,7 @@ public class StartUpActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONArray response) {
                     Log.d("StartUp_log", response.toString());
-                    StoreJsonArray(response);
+                    StorageHelper.StoreCrimeLocationTypesJSON(StartUpActivity.this, response);
                     FinishStartup();
                 }
             },
@@ -89,30 +86,8 @@ public class StartUpActivity extends AppCompatActivity {
         finish();
     }
 
-    private void StoreJsonArray(JSONArray jsonArray){
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(getString(R.string.ClTypesStorage), jsonArray);
-
-        } catch (JSONException e){
-
-            Log.d("StartUp_log", e.toString());
-        }
-
-        SharedPreferences settings = getSharedPreferences("CrimeLocationTypesJSON", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("crimeLocationTypesJson", jsonObject.toString());
-        editor.commit();
-
-    }
-
-    private Boolean isDataInStorage(){
-        SharedPreferences settings = getSharedPreferences("CrimeLocationTypesJSON", 0);
-        return settings.contains("crimeLocationTypesJson");
-    }
-
-    private void unableToLaunchDialog(){
+    private void UnableToLaunchDialog(){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

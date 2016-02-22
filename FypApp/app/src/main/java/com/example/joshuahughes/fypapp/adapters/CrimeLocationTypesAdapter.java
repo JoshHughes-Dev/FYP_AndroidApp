@@ -3,7 +3,6 @@ package com.example.joshuahughes.fypapp.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,7 @@ import android.widget.TextView;
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 
 import java.util.ArrayList;
 
@@ -67,10 +64,6 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
-
-
         final CrimeLocationTypeModel model = clTypesArray.get(position);
 
         holder.getTextView().setText(model.Name);
@@ -80,7 +73,7 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cltInfoDialog(imageButton.getContext(), model);
+                cltInfoDialog(view.getContext(), model);
             }
         });
 
@@ -97,8 +90,8 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
 
 
     private void cltInfoDialog(Context context, CrimeLocationTypeModel model){
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         String LocationInfo = "Location type: "  + model.LocationType;
         String CrimeInfo = "Crime Types: ";
@@ -109,7 +102,6 @@ public class CrimeLocationTypesAdapter extends RecyclerView.Adapter<CrimeLocatio
                 CrimeInfo += ", ";
             }
         }
-
 
         builder.setTitle("Crime-location type information");
         builder.setMessage(LocationInfo + "\n" + CrimeInfo);
