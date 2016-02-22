@@ -30,9 +30,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
-public class DashBoardActivity extends AppCompatActivity {
-
-
+public class DashBoardActivity extends BaseActivity {
+    
     protected RecyclerView mRecyclerView;
     protected CrimeLocationTypesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -60,36 +59,6 @@ public class DashBoardActivity extends AppCompatActivity {
         if(!isConnected){
             createOfflineModeDialog();
         }
-
-    }
-
-    //SETS options menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-
-        Intent intent;
-
-        switch(item.getItemId()){
-            case R.id.about:
-                intent = new Intent(this, AboutActivity.class);
-                this.startActivity(intent);
-                break;
-            case R.id.savedRequests:
-                //intent = new Intent(this, null);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
-
-        return true;
 
     }
 

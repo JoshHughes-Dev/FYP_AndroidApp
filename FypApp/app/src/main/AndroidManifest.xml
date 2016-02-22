@@ -32,7 +32,8 @@
         <activity
             android:name=".activities.SavedRequestsActivity"
             android:label="@string/title_activity_saved_requests"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activities.BaseActivity"></activity>
     </application>
 
 </manifest>
