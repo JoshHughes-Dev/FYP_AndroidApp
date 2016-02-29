@@ -12,17 +12,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,20 +37,28 @@ import com.google.android.gms.maps.model.LatLng;
  * Use the {@link MapInputFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapInputFragment extends Fragment implements OnMapReadyCallback {
+public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener {
 
     MapView mMapView;
+    TextView radiusValueText;
+    SeekBar radiusSeekBar;
+
+    private Marker locationMarker;
+    private Circle locationRadius;
     private GoogleMap mMap;
+
+    private Integer defaultRadius = 100;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-
     // TODO: Rename and change types of parameters
     private String mParam1;
 
+
     private OnFragmentInteractionListener mListener;
 
+    // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
     public MapInputFragment() {
         // Required empty public constructor
@@ -83,6 +96,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map_input, container, false);
 
+        radiusSeekBar = (SeekBar) v.findViewById(R.id.radiusSeekBar);
+        radiusSeekBar.setMax((radiusMax - radiusMin) / radiusStep);
+        radiusSeekBar.setProgress(radiusValue);
+        radiusSeekBar.setOnSeekBarChangeListener(this);
+
         mMapView = (MapView) v.findViewById(R.id.googleMap);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
@@ -96,7 +114,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback {
         return v;
 
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -125,17 +142,24 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onMapInputInteraction(Uri uri);
+        void onMapInputInteraction(LatLng position, Integer radius);
     }
+
+
+    // MAP VIEW implements -----------------------------------------------------------------------//
 
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 14.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 16.0f));
+        mMap.setOnMapClickListener(this);
     }
 
-
+    @Override
+    public void onMapClick(LatLng point){
+        InitDrawPoint(point);
+        mListener.onMapInputInteraction(point, radiusValue);
+    }
 
 
     @Override
@@ -162,6 +186,89 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback {
         super.onLowMemory();
     }
 
+    // SEEK BAR implements -----------------------------------------------------------------------//
+
+    private Integer radiusValue = 100;
+    private Integer radiusMin = 50;
+    private Integer radiusMax = 5000;
+    private Integer radiusStep = 1;
+
+
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar){
+        ReDrawCircle(false);
+        mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar){}
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+        radiusValue = radiusMin + (progress * radiusStep);
+
+        ReDrawCircle(true);
+
+    }
+
+    // DRAW POSITION ----------------------------------------//
+
+
+    private void InitDrawPoint(LatLng point){
+        if(locationMarker != null) {
+            locationMarker.remove();
+            locationRadius.remove();
+        }
+
+        locationMarker = mMap.addMarker(new MarkerOptions()
+                .position(point));
+
+
+        locationRadius = mMap.addCircle(new CircleOptions()
+                .center(point)
+                .radius(radiusValue)
+                .fillColor(0x3033FFFF)
+                .strokeWidth(2));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationRadius.getCenter(), getZoomLevel(locationRadius)));
+    }
+
+
+
+    private void ReDrawCircle(Boolean inProgress) {
+        if (locationMarker != null && locationRadius != null) {
+
+            locationRadius.remove();
+
+            CircleOptions circleOptions = new CircleOptions();
+
+            circleOptions.center(locationMarker.getPosition());
+            circleOptions.radius(radiusValue);
+            circleOptions.strokeWidth(2);
+
+            if(!inProgress){
+                circleOptions.fillColor(0x4533FFFF);
+            }
+
+            locationRadius = mMap.addCircle(circleOptions);
+
+            if(!inProgress){
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(circleOptions.getCenter(), getZoomLevel(locationRadius)));
+            }
+
+        }
+    }
+
+    private int getZoomLevel(Circle circle){
+        int zoomLevel = 11;
+        if(circle != null){
+            double radius = circle.getRadius() + circle.getRadius() / 2;
+            double scale = radius / 500;
+            zoomLevel = (int) (16 - Math.log(scale)/Math.log(2));
+        }
+        return zoomLevel;
+    }
 
 
 }

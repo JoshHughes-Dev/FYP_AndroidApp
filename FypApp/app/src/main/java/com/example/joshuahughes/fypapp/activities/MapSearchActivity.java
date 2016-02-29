@@ -28,7 +28,7 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
-
+import com.google.android.gms.maps.model.LatLng;
 
 
 import org.json.JSONObject;
@@ -36,6 +36,9 @@ import org.json.JSONObject;
 
 public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener {
 
+    TextView textview;
+    CrimeLocationTypeModel crimeLocationType;
+    String urlString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,30 +55,33 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         Intent intent = getIntent();
 
-        CrimeLocationTypeModel crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
+        crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
 
         setTitle(crimeLocationType.Name);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Will open 'save to favourites' dialog", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Will open 'save to favourites' dialog", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
-        final String testUrl = getString(R.string.baseUrl) + getString(R.string.crimeLocationTypesCall) + "/" + String.valueOf(crimeLocationType.Id) + "/" + "51.510343/-0.073214/50";
+        LatLng testLatLng = new LatLng(51.510343,-0.073214);
+        Integer testRadius = 50;
 
-        TextView textview = (TextView) findViewById(R.id.textView3);
-        textview.setText(testUrl);
+        textview = (TextView) findViewById(R.id.textView3);
+
+        drawText(testLatLng, testRadius);
+
 
 
         Button testButton = (Button) findViewById(R.id.button);
         testButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
-                GetCrimeLocationJson(testUrl, progressBar);
+                GetCrimeLocationJson(urlString, progressBar);
             }
         });
 
@@ -109,9 +115,20 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     }
 
     @Override
-    public void onMapInputInteraction(Uri uri){
-
+    public void onMapInputInteraction(LatLng position, Integer radius){
+        drawText(position, radius);
     }
 
+    private void drawText(LatLng position, Integer radius){
+
+        urlString = getString(R.string.baseUrl) +
+                        getString(R.string.crimeLocationTypesCall) + "/" +
+                        String.valueOf(crimeLocationType.Id) + "/" +
+                        position.latitude + "/"+
+                        position.longitude + "/" +
+                        radius;
+
+        textview.setText(urlString);
+    }
 
 }
