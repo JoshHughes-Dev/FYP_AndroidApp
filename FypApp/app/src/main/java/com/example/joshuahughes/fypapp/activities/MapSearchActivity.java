@@ -1,6 +1,8 @@
 package com.example.joshuahughes.fypapp.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -28,17 +31,22 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
+import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+
 
 
 import org.json.JSONObject;
 
 
+
+
 public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener {
 
-    TextView textview;
-    CrimeLocationTypeModel crimeLocationType;
-    String urlString;
+    private TextView textview;
+    private CrimeLocationTypeModel crimeLocationType;
+    private String urlString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,32 +98,36 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     private void GetCrimeLocationJson(String url, final ProgressBar progressBar) {
 
-        final TextView responseTextView = (TextView) findViewById(R.id.textView4);
-
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         progressBar.setVisibility(View.GONE);
-                        Log.d("StartUp_log", response.toString());
-                        responseTextView.setText(response.toString());
+                        createTempResultsDialog(response.toString());
+                        CrimeLocationsRequestModel model = ParseCrimeLocationsRequest(response.toString());
+                        SendMapInputResults(model);
+
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressBar.setVisibility(View.GONE);
-                        Log.d("StartUp_log", error.toString());
-                        responseTextView.setText(error.toString());
+                        createTempResultsDialog(error.toString());
                     }
                 }
         );
+
+        getRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
     @Override
-    public void onMapInputInteraction(LatLng position, Integer radius){
+    public void onMapInputInteraction(LatLng position, Integer radius) {
         drawText(position, radius);
     }
 
@@ -129,6 +141,32 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                         radius;
 
         textview.setText(urlString);
+    }
+
+
+    private void createTempResultsDialog(String str){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Results");
+        builder.setMessage(str);
+        builder.setCancelable(true);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private CrimeLocationsRequestModel ParseCrimeLocationsRequest(String jsonObject){
+
+        Gson gson = new Gson();
+        CrimeLocationsRequestModel model = gson.fromJson(jsonObject, CrimeLocationsRequestModel.class);
+        return model;
+    }
+
+    public void SendMapInputResults(CrimeLocationsRequestModel model){
+        MapInputFragment mapInputFragment =(MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+        if(mapInputFragment !=null){
+            mapInputFragment.drawResultsMarkersTest(model);
+        }
     }
 
 }

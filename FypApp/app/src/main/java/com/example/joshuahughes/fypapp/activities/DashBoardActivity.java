@@ -76,8 +76,6 @@ public class DashBoardActivity extends BaseActivity {
                 createOfflineModeDialog();
             }
         }
-
-
     }
 
 

@@ -17,17 +17,22 @@ import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
 
+import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
+import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,15 +44,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener {
 
-    MapView mMapView;
-    TextView radiusValueText;
-    SeekBar radiusSeekBar;
 
-    private Marker locationMarker;
-    private Circle locationRadius;
-    private GoogleMap mMap;
+    private ArrayList<Marker> resultsMarkers;
 
-    private Integer defaultRadius = 100;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +58,20 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private OnFragmentInteractionListener mListener;
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        void onMapInputInteraction(LatLng position, Integer radius);
+    }
 
     public MapInputFragment() {
         // Required empty public constructor
@@ -88,6 +101,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             mParam1 = getArguments().getString(ARG_PARAM1);
         }
 
+        resultsMarkers = new ArrayList<Marker>();
 
     }
 
@@ -131,22 +145,16 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onMapInputInteraction(LatLng position, Integer radius);
-    }
+
 
 
     // MAP VIEW implements -----------------------------------------------------------------------//
+
+    private MapView mMapView;
+    private Marker locationMarker;
+    private Circle locationRadius;
+    private GoogleMap mMap;
+
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -158,6 +166,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     @Override
     public void onMapClick(LatLng point){
         InitDrawPoint(point);
+        RemoveResultsMarkers();
         mListener.onMapInputInteraction(point, radiusValue);
     }
 
@@ -188,16 +197,17 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     // SEEK BAR implements -----------------------------------------------------------------------//
 
+    private SeekBar radiusSeekBar;
     private Integer radiusValue = 100;
     private Integer radiusMin = 50;
     private Integer radiusMax = 5000;
     private Integer radiusStep = 1;
 
 
-
     @Override
     public void onStopTrackingTouch(SeekBar seekBar){
         ReDrawCircle(false);
+        RemoveResultsMarkers();
         mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
     }
 
@@ -206,8 +216,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+        Log.d("TEST", Integer.toString(progress));
         radiusValue = radiusMin + (progress * radiusStep);
-
         ReDrawCircle(true);
 
     }
@@ -216,13 +226,15 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
 
     private void InitDrawPoint(LatLng point){
+
         if(locationMarker != null) {
             locationMarker.remove();
             locationRadius.remove();
         }
 
         locationMarker = mMap.addMarker(new MarkerOptions()
-                .position(point));
+                .position(point)
+        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
 
 
         locationRadius = mMap.addCircle(new CircleOptions()
@@ -260,6 +272,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
+
     private int getZoomLevel(Circle circle){
         int zoomLevel = 11;
         if(circle != null){
@@ -270,5 +283,28 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         return zoomLevel;
     }
 
+    public void drawResultsMarkersTest(CrimeLocationsRequestModel model){
+
+        RemoveResultsMarkers();
+
+
+        for(int j = 0; j<model.CrimeLocations.size(); j++){
+
+            CrimeLocationModel clm = model.CrimeLocations.get(j);
+
+            LatLng latLng = new LatLng(clm.Location.Latitude, clm.Location.Longitude);
+
+            Marker marker = mMap.addMarker((new MarkerOptions().position(latLng)));
+
+            resultsMarkers.add(marker);
+        }
+    }
+
+    private void RemoveResultsMarkers(){
+        for(int i = 0; i< resultsMarkers.size(); i++){
+            resultsMarkers.get(i).remove();
+        }
+        resultsMarkers.clear();
+    }
 
 }
