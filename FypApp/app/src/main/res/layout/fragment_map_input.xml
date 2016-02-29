@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.joshuahughes.fypapp.fragments.MapInputFragment">
+
+
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/googleMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/mapControlsBottom"/>
+
+
+    <LinearLayout
+        android:id="@+id/mapControlsBottom"
+        android:layout_width="match_parent"
+        android:layout_height="32dip"
+        android:layout_alignParentBottom="true">
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/seekBar" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
