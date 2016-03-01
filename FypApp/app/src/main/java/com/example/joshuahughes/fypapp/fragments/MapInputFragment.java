@@ -1,6 +1,7 @@
 package com.example.joshuahughes.fypapp.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 
 import android.net.ConnectivityManager;
@@ -50,6 +51,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     private ArrayList<Marker> resultsMarkers;
     private OnFragmentInteractionListener mListener;
+    public ProgressDialog progressDialog;
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
@@ -65,6 +67,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      */
     public interface OnFragmentInteractionListener {
         void onMapInputInteraction(LatLng position, Integer radius);
+        Boolean isConnectedToInternet();
     }
 
     public MapInputFragment() {
@@ -83,7 +86,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public static MapInputFragment newInstance() {
         MapInputFragment fragment = new MapInputFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -91,9 +93,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //mParam1 = getArguments().getString(ARG_PARAM1);
-        }
 
         resultsMarkers = new ArrayList<Marker>();
 
@@ -141,7 +140,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
 
 
-
     // MAP VIEW implements -----------------------------------------------------------------------//
 
     private MapView mMapView;
@@ -159,18 +157,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     @Override
     public void onMapClick(LatLng point){
-        InitDrawPoint(point);
         RemoveResultsMarkers();
-
-        if(isConnected()){
-            mListener.onMapInputInteraction(point, radiusValue);
-        }
-        else{
-            createOfflineToast();
-        }
-
+        SetNewLocationMarker(point,radiusValue);
+        AttemptSearchRequest();
     }
-
 
     @Override
     public void onResume(){
@@ -200,22 +190,16 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     private SeekBar radiusSeekBar;
     private Integer radiusValue = 400;
-    private Integer radiusMin = 50;
-    private Integer radiusMax = 5000;
-    private Integer radiusStep = 1;
+    final private Integer radiusMin = 50;
+    final private Integer radiusMax = 5000;
+    final private Integer radiusStep = 1;
 
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar){
-        ReDrawCircle(false);
+        UpdateLocationRadiusSize(locationMarker, radiusValue, false);
         RemoveResultsMarkers();
-
-        if(isConnected()){
-            mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
-        }
-        else{
-            createOfflineToast();
-        }
+        AttemptSearchRequest();
 
     }
 
@@ -224,64 +208,69 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-        Log.d("TEST", Integer.toString(progress));
+
         radiusValue = radiusMin + (progress * radiusStep);
-        ReDrawCircle(true);
+
+        UpdateLocationRadiusSize(locationMarker, radiusValue, true);
+        Log.d("progress: " + Integer.toString(progress), "radiusValue: " + Integer.toString(radiusValue));
+        Log.d("locationRadius", Double.toString(locationRadius.getRadius()));
 
     }
 
     // DRAW POSITION ----------------------------------------//
 
+    private void SetNewLocationMarker(LatLng point, int circleRadius){
 
-    private void InitDrawPoint(LatLng point){
+        if(locationMarker == null) {
 
-        if(locationMarker != null) {
-            locationMarker.remove();
-            locationRadius.remove();
+            locationMarker = mMap.addMarker(new MarkerOptions()
+                    .position(point)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+
+            locationRadius = mMap.addCircle(new CircleOptions()
+                    .center(locationMarker.getPosition())
+                    .radius(circleRadius)
+                    .fillColor(0x3033FFFF)
+                    .strokeWidth(2));
+
+            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, GetZoomLevel(locationRadius)));
+        }
+        else{
+            UpdateLocationMarkerPosition(point);
         }
 
-        locationMarker = mMap.addMarker(new MarkerOptions()
-                .position(point)
-        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-
-
-        locationRadius = mMap.addCircle(new CircleOptions()
-                .center(point)
-                .radius(radiusValue)
-                .fillColor(0x3033FFFF)
-                .strokeWidth(2));
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationRadius.getCenter(), getZoomLevel(locationRadius)));
     }
 
 
+    private void UpdateLocationMarkerPosition(LatLng newPoint){
+        locationMarker.setPosition(newPoint);
+        locationRadius.setCenter(newPoint);
 
-    private void ReDrawCircle(Boolean inProgress) {
-        if (locationMarker != null && locationRadius != null) {
+        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, GetZoomLevel(locationRadius)));
+    }
 
-            locationRadius.remove();
+    private void UpdateLocationRadiusSize(Marker locationMarker, int radius, Boolean inProgress){
 
-            CircleOptions circleOptions = new CircleOptions();
+        if(locationMarker != null){
 
-            circleOptions.center(locationMarker.getPosition());
-            circleOptions.radius(radiusValue);
-            circleOptions.strokeWidth(2);
-
-            if(!inProgress){
-                circleOptions.fillColor(0x4533FFFF);
+            if(inProgress) {
+                locationRadius.setFillColor(80000000);
+            }else{
+                locationRadius.setFillColor(0x4533FFFF);
             }
 
-            locationRadius = mMap.addCircle(circleOptions);
+            locationRadius.setCenter(locationMarker.getPosition());
+            locationRadius.setRadius(radius);
 
-            if(!inProgress){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(circleOptions.getCenter(), getZoomLevel(locationRadius)));
-            }
-
+//            if(!inProgress){
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius)));
+//            }
         }
+
     }
 
 
-    private int getZoomLevel(Circle circle){
+    private int GetZoomLevel(Circle circle){
         int zoomLevel = 11;
         if(circle != null){
             double radius = circle.getRadius() + circle.getRadius() / 2;
@@ -291,11 +280,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         return zoomLevel;
     }
 
-    public void drawResultsMarkersTest(CrimeLocationsRequestModel model){
+    public void DrawResultsMarkersTest(CrimeLocationsRequestModel model){
 
+        progressDialog.cancel();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius)));
         createResultsToast(model);
         RemoveResultsMarkers();
-
 
         for(int j = 0; j<model.CrimeLocations.size(); j++){
 
@@ -303,7 +293,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             LatLng latLng = new LatLng(clm.Location.Latitude, clm.Location.Longitude);
 
-            Marker marker = mMap.addMarker((new MarkerOptions().position(latLng)));
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(clm.Location.Name)
+                    .snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude));
 
             resultsMarkers.add(marker);
         }
@@ -317,21 +310,32 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     }
 
     private void createResultsToast(CrimeLocationsRequestModel model){
-        Toast toast = Toast.makeText(getActivity(), Integer.toString(model.CrimeLocations.size()) + " locations", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getActivity(), Integer.toString(model.CrimeLocations.size()) + " locations found", Toast.LENGTH_SHORT);
         toast.show();
-    }
-
-    private boolean isConnected() {
-
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnectedOrConnecting());
-
     }
 
     private void createOfflineToast(){
         Toast toast = Toast.makeText(getActivity(), "Can't perform new search without internet connection", Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    private void AttemptSearchRequest(){
+
+        if(mListener.isConnectedToInternet()){
+            CreateProgressDialog();
+            mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
+        }
+        else{
+            createOfflineToast();
+        }
+    }
+
+    private void CreateProgressDialog(){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Searching for Crime Locations...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
 }

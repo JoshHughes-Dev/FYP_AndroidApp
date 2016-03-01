@@ -53,7 +53,7 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    private boolean isConnected() {
+    public boolean isConnected() {
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();

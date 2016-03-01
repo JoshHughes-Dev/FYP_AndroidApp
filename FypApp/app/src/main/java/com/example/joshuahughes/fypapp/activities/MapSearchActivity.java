@@ -34,7 +34,7 @@ import org.json.JSONObject;
 
 public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener {
 
-    private TextView textview;
+//    private TextView textview;
     private CrimeLocationTypeModel crimeLocationType;
     private String urlString;
     private ProgressBar progressBar;
@@ -48,8 +48,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
+        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //progressBar.setVisibility(View.GONE);
 
 
         Intent intent = getIntent();
@@ -67,12 +67,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 //            }
 //        });
 
-        LatLng testLatLng = new LatLng(51.510343,-0.073214);
-        Integer testRadius = 50;
+        //LatLng testLatLng = new LatLng(51.510343,-0.073214);
+        //Integer testRadius = 50;
 
-        textview = (TextView) findViewById(R.id.textView3);
+        //textview = (TextView) findViewById(R.id.textView3);
 
-        drawText(testLatLng, testRadius);
+        //drawText(testLatLng, testRadius);
 
 
 
@@ -80,14 +80,17 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     private void GetCrimeLocationJson(String url) {
 
-        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setVisibility(View.VISIBLE);
+
+        final String requestTag = "CRIME_LOCATIONS_REQUEST";
+        //cancel any requests queued
+        VolleyQueue.getInstance(this).cancelAllRequests(requestTag);
+
 
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        progressBar.setVisibility(View.GONE);
-
                         CrimeLocationsRequestModel model = ParseCrimeLocationsRequest(response.toString());
                         SendMapInputResults(model);
 
@@ -96,8 +99,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressBar.setVisibility(View.GONE);
-
                         createErrorDialog(error.toString());
                     }
                 }
@@ -108,28 +109,42 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
+        getRequest.setTag(requestTag);
+
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
     @Override
     public void onMapInputInteraction(LatLng position, Integer radius) {
-        drawText(position, radius);
-
+        setUrlString(position,radius);
         GetCrimeLocationJson(urlString);
     }
 
-    private void drawText(LatLng position, Integer radius){
-
-        urlString = getString(R.string.baseUrl) +
-                        getString(R.string.crimeLocationTypesCall) + "/" +
-                        String.valueOf(crimeLocationType.Id) + "/" +
-                        position.latitude + "/"+
-                        position.longitude + "/" +
-                        radius;
-
-        textview.setText(urlString);
+    @Override
+    public Boolean isConnectedToInternet(){
+        return isConnected();
     }
 
+//    private void drawText(LatLng position, Integer radius){
+//
+//        urlString = getString(R.string.baseUrl) +
+//                        getString(R.string.crimeLocationTypesCall) + "/" +
+//                        String.valueOf(crimeLocationType.Id) + "/" +
+//                        position.latitude + "/"+
+//                        position.longitude + "/" +
+//                        radius;
+//
+//        textview.setText(urlString);
+//    }
+
+    private void setUrlString(LatLng position, Integer radius){
+        urlString = getString(R.string.baseUrl) +
+                getString(R.string.crimeLocationTypesCall) + "/" +
+                String.valueOf(crimeLocationType.Id) + "/" +
+                position.latitude + "/"+
+                position.longitude + "/" +
+                radius;
+    }
 
     private void createErrorDialog(String str){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -152,9 +167,17 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     public void SendMapInputResults(CrimeLocationsRequestModel model){
         MapInputFragment mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+
         if(mapInputFragment !=null){
-            mapInputFragment.drawResultsMarkersTest(model);
+
+            if(model == null){
+                mapInputFragment.progressDialog.cancel();
+            } else {
+                mapInputFragment.DrawResultsMarkersTest(model);
+            }
         }
+
+
     }
 
 }

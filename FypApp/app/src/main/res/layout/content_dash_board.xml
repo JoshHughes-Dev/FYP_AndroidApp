@@ -39,15 +39,6 @@
         <!--android:focusable="true"-->
         <!--android:focusableInTouchMode="true"/>-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textView2"
-        android:paddingBottom="20dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/listView"/>
 
 
 

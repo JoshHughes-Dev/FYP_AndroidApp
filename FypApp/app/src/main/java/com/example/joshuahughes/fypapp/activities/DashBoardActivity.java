@@ -46,7 +46,6 @@ public class DashBoardActivity extends BaseActivity {
     protected ListView mListView;
     protected CrimeLocationTypesAdapter2 mAdapter2;
 
-
     protected ArrayList<CrimeLocationTypeModel> clTypesArray;
 
     @Override
@@ -63,8 +62,6 @@ public class DashBoardActivity extends BaseActivity {
         Intent intent = getIntent();
 
         String jsonString = StorageHelper.RetrieveCrimeLocationTypesJSON(this).toString();
-        TextView textview = (TextView)findViewById(R.id.textView2);
-        textview.setText(jsonString);
 
         clTypesArray = createCLTarray(jsonString);
 

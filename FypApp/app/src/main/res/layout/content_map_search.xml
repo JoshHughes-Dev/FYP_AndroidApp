@@ -8,37 +8,13 @@
     tools:context="com.example.joshuahughes.fypapp.activities.MapSearchActivity"
     tools:showIn="@layout/activity_map_search">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tempLinear">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/textView3" />
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar" />
-
-    </LinearLayout>
-
-
-
-
 
 
     <fragment
         android:name="com.example.joshuahughes.fypapp.fragments.MapInputFragment"
         android:id="@+id/map_input_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tempLinear"/>
+        android:layout_height="match_parent" />
 
 
 </RelativeLayout>
