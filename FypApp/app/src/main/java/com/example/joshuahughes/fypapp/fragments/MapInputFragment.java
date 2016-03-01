@@ -3,6 +3,8 @@ package com.example.joshuahughes.fypapp.fragments;
 
 import android.content.Context;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
 
@@ -46,15 +49,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
 
     private ArrayList<Marker> resultsMarkers;
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-
-
     private OnFragmentInteractionListener mListener;
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
@@ -86,10 +80,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      * @return A new instance of fragment MapInputFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MapInputFragment newInstance(String param1 ) {
+    public static MapInputFragment newInstance() {
         MapInputFragment fragment = new MapInputFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        //args.putString(ARG_PARAM1, param1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -98,7 +92,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            //mParam1 = getArguments().getString(ARG_PARAM1);
         }
 
         resultsMarkers = new ArrayList<Marker>();
@@ -159,7 +153,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 16.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 14.0f));
         mMap.setOnMapClickListener(this);
     }
 
@@ -167,7 +161,14 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onMapClick(LatLng point){
         InitDrawPoint(point);
         RemoveResultsMarkers();
-        mListener.onMapInputInteraction(point, radiusValue);
+
+        if(isConnected()){
+            mListener.onMapInputInteraction(point, radiusValue);
+        }
+        else{
+            createOfflineToast();
+        }
+
     }
 
 
@@ -198,7 +199,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     // SEEK BAR implements -----------------------------------------------------------------------//
 
     private SeekBar radiusSeekBar;
-    private Integer radiusValue = 100;
+    private Integer radiusValue = 400;
     private Integer radiusMin = 50;
     private Integer radiusMax = 5000;
     private Integer radiusStep = 1;
@@ -208,7 +209,14 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onStopTrackingTouch(SeekBar seekBar){
         ReDrawCircle(false);
         RemoveResultsMarkers();
-        mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
+
+        if(isConnected()){
+            mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
+        }
+        else{
+            createOfflineToast();
+        }
+
     }
 
     @Override
@@ -285,6 +293,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     public void drawResultsMarkersTest(CrimeLocationsRequestModel model){
 
+        createResultsToast(model);
         RemoveResultsMarkers();
 
 
@@ -305,6 +314,24 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             resultsMarkers.get(i).remove();
         }
         resultsMarkers.clear();
+    }
+
+    private void createResultsToast(CrimeLocationsRequestModel model){
+        Toast toast = Toast.makeText(getActivity(), Integer.toString(model.CrimeLocations.size()) + " locations", Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    private boolean isConnected() {
+
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnectedOrConnecting());
+
+    }
+
+    private void createOfflineToast(){
+        Toast toast = Toast.makeText(getActivity(), "Can't perform new search without internet connection", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
 }

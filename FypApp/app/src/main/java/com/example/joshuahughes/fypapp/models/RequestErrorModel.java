@@ -19,7 +19,7 @@ public class RequestErrorModel implements Parcelable {
     @SerializedName("requestErrorTypeEnum")
     public String RequestErrorType;
 
-    @SerializedName("message")
+    @SerializedName("requestErrorMessageEnum")
     public String RequestErrorMessage;
 
 
