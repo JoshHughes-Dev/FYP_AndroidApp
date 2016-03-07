@@ -50,6 +50,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
 
     private ArrayList<Marker> resultsMarkers;
+    private CrimeLocationsRequestModel requestModel;
+    private LatLng selectedLocation;
+    private Integer selectedRadius = 400; //400 is default value;
+
     private OnFragmentInteractionListener mListener;
     public ProgressDialog progressDialog;
 
@@ -67,6 +71,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      */
     public interface OnFragmentInteractionListener {
         void onMapInputInteraction(LatLng position, Integer radius);
+        void onMapLoadSavedInstance();
         Boolean isConnectedToInternet();
     }
 
@@ -94,18 +99,27 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        resultsMarkers = new ArrayList<Marker>();
-
+        // Restoring the markers on configuration changes
+        if(savedInstanceState!=null){
+            selectedLocation = savedInstanceState.getParcelable("selectedLocation");
+            selectedRadius = savedInstanceState.getInt("selectedRadius");
+            resultsMarkers = new ArrayList<Marker>();
+        }
+        else{
+            selectedRadius = 400;
+            resultsMarkers = new ArrayList<Marker>();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map_input, container, false);
 
         radiusSeekBar = (SeekBar) v.findViewById(R.id.radiusSeekBar);
         radiusSeekBar.setMax((radiusMax - radiusMin) / radiusStep);
-        radiusSeekBar.setProgress(radiusValue);
+        radiusSeekBar.setProgress(selectedRadius);
         radiusSeekBar.setOnSeekBarChangeListener(this);
 
         mMapView = (MapView) v.findViewById(R.id.googleMap);
@@ -138,6 +152,21 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         mListener = null;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("selectedLocation", selectedLocation);
+        outState.putInt("selectedRadius", selectedRadius);
+        // Adding the resultMarkerOptions arraylist to Bundle
+        //outState.putParcelableArrayList("results", resultsMarkers);
+        //Adding LocationMarker
+        //outState.putParcelable("locationMaker", locationMarker);
+        //Adding LocationRadius
+        //outState.putParcelable("locationRadius", locationRadius);
+
+
+    }
 
 
     // MAP VIEW implements -----------------------------------------------------------------------//
@@ -151,14 +180,28 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 14.0f));
+
         mMap.setOnMapClickListener(this);
+
+        if(selectedLocation != null && selectedRadius != null){
+            SetNewLocationMarker(selectedLocation, selectedRadius);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, GetZoomLevel(selectedRadius)));
+            mListener.onMapLoadSavedInstance();
+
+        }
+        else{
+            //default camera view
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.769261, -1.2272118), 14.0f));
+        }
+
     }
 
     @Override
     public void onMapClick(LatLng point){
+        selectedLocation = point;
+
         RemoveResultsMarkers();
-        SetNewLocationMarker(point,radiusValue);
+        SetNewLocationMarker(selectedLocation,selectedRadius);
         AttemptSearchRequest();
     }
 
@@ -189,7 +232,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     // SEEK BAR implements -----------------------------------------------------------------------//
 
     private SeekBar radiusSeekBar;
-    private Integer radiusValue = 400;
+    //private Integer radiusValue = 400;
     final private Integer radiusMin = 50;
     final private Integer radiusMax = 5000;
     final private Integer radiusStep = 1;
@@ -197,9 +240,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar){
-        UpdateLocationRadiusSize(locationMarker, radiusValue, false);
+        UpdateLocationRadiusSize(locationMarker, selectedRadius, false);
         RemoveResultsMarkers();
-        AttemptSearchRequest();
+        if(locationMarker != null) {
+            AttemptSearchRequest();
+        }
 
     }
 
@@ -209,11 +254,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 
-        radiusValue = radiusMin + (progress * radiusStep);
-
-        UpdateLocationRadiusSize(locationMarker, radiusValue, true);
-        Log.d("progress: " + Integer.toString(progress), "radiusValue: " + Integer.toString(radiusValue));
-        Log.d("locationRadius", Double.toString(locationRadius.getRadius()));
+        selectedRadius = radiusMin + (progress * radiusStep);
+        UpdateLocationRadiusSize(locationMarker, selectedRadius, true);
 
     }
 
@@ -233,7 +275,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
                     .fillColor(0x3033FFFF)
                     .strokeWidth(2));
 
-            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(point, GetZoomLevel(locationRadius)));
         }
         else{
             UpdateLocationMarkerPosition(point);
@@ -245,8 +286,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private void UpdateLocationMarkerPosition(LatLng newPoint){
         locationMarker.setPosition(newPoint);
         locationRadius.setCenter(newPoint);
-
-        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, GetZoomLevel(locationRadius)));
     }
 
     private void UpdateLocationRadiusSize(Marker locationMarker, int radius, Boolean inProgress){
@@ -262,28 +301,29 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             locationRadius.setCenter(locationMarker.getPosition());
             locationRadius.setRadius(radius);
 
-//            if(!inProgress){
-//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius)));
-//            }
+
         }
 
     }
 
 
-    private int GetZoomLevel(Circle circle){
-        int zoomLevel = 11;
-        if(circle != null){
-            double radius = circle.getRadius() + circle.getRadius() / 2;
-            double scale = radius / 500;
-            zoomLevel = (int) (16 - Math.log(scale)/Math.log(2));
-        }
+    private int GetZoomLevel(double r){
+        //int zoomLevel = 11;
+
+        double radius = r + r / 2;
+        double scale = radius / 500;
+        int zoomLevel = (int) (16 - Math.log(scale)/Math.log(2));
+
         return zoomLevel;
     }
 
-    public void DrawResultsMarkersTest(CrimeLocationsRequestModel model){
 
-        progressDialog.cancel();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius)));
+    //public for parent Activity
+    public void DrawResultsMarkersTest(CrimeLocationsRequestModel model){
+        if(progressDialog != null) {
+            progressDialog.cancel();
+        }
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius.getRadius())));
         createResultsToast(model);
         RemoveResultsMarkers();
 
@@ -322,8 +362,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private void AttemptSearchRequest(){
 
         if(mListener.isConnectedToInternet()){
+
             CreateProgressDialog();
-            mListener.onMapInputInteraction(locationMarker.getPosition(), radiusValue);
+            mListener.onMapInputInteraction(selectedLocation, selectedRadius);
         }
         else{
             createOfflineToast();

@@ -52,6 +52,7 @@ public class DashBoardActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         //sets content view for activity
         setContentView(R.layout.activity_dash_board);
         //sets toolbar view for activity
@@ -61,9 +62,12 @@ public class DashBoardActivity extends BaseActivity {
 
         Intent intent = getIntent();
 
-        String jsonString = StorageHelper.RetrieveCrimeLocationTypesJSON(this).toString();
 
+
+        String jsonString = StorageHelper.RetrieveCrimeLocationTypesJSON(this).toString();
         clTypesArray = createCLTarray(jsonString);
+
+
 
         CreateListView(clTypesArray);
         //CreateRecyclerView(clTypesArray);
