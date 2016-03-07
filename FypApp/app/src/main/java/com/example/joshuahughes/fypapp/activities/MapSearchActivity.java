@@ -1,6 +1,7 @@
 package com.example.joshuahughes.fypapp.activities;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +36,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     private CrimeLocationTypeModel crimeLocationType;
     private String urlString;
     private CrimeLocationsRequestModel crimeLocationsRequestModel;
+    public ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +76,34 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         savedInstanceState.putParcelable("crimeLocationRequestModel", crimeLocationsRequestModel);
 
     }
-//
+
+    //Map fragment listener implements ----------------------------------------------------------//
+
+    @Override
+    public void onMapInputInteraction(LatLng position, Integer radius) {
+        Log.d("Request", "getting new");
+        CreateRequestProgressDialog();
+        GetCrimeLocationJson(getUrlString(position, radius));
+
+    }
+
+    @Override
+    public void onMapLoadSavedInstance(){
+        Log.d("Request", "sending existing");
+        SendMapInputResults();
+    }
 
 
+    @Override
+    public Boolean isConnectedToInternet(){
+        return isConnected();
+    }
+
+    //--------------------------------------------------------------------------------------------//
 
     private void GetCrimeLocationJson(String url) {
 
-
+        //define request tag (for queue purposes)
         final String requestTag = "CRIME_LOCATIONS_REQUEST";
         //cancel any requests queued
         VolleyQueue.getInstance(this).cancelAllRequests(requestTag);
@@ -92,7 +115,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                     public void onResponse(JSONObject response) {
                         crimeLocationsRequestModel = ParseCrimeLocationsRequest(response.toString());
                         SendMapInputResults();
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -103,47 +125,32 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 }
         );
 
+        //set request queue policy
         getRequest.setRetryPolicy(new DefaultRetryPolicy(
                 15000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        );
+        //set tag to this request
         getRequest.setTag(requestTag);
-
+        //add this request to queue
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
-    //MapInputFragment calls this
-    @Override
-    public void onMapInputInteraction(LatLng position, Integer radius) {
-        setUrlString(position, radius);
-        Log.d("Request", "getting new");
-        GetCrimeLocationJson(urlString);
-
-
-    }
-    //MapInput Fragment calls this
-    @Override
-    public void onMapLoadSavedInstance(){
-        Log.d("Request", "sending existing");
-        SendMapInputResults();
-    }
-
-    // MapInputFragment calls this
-    @Override
-    public Boolean isConnectedToInternet(){
-        return isConnected();
-    }
 
 
 
-    private void setUrlString(LatLng position, Integer radius){
-        urlString = getString(R.string.baseUrl) +
+
+
+    private String getUrlString(LatLng position, Integer radius){
+        String urlString = getString(R.string.baseUrl) +
                 getString(R.string.crimeLocationTypesCall) + "/" +
                 String.valueOf(crimeLocationType.Id) + "/" +
                 position.latitude + "/"+
                 position.longitude + "/" +
                 radius;
+
+        return urlString;
     }
 
     private void createErrorDialog(String str){
@@ -165,19 +172,25 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         return model;
     }
 
-    public void SendMapInputResults(){
+    private void SendMapInputResults(){
+        //get map fragment
         MapInputFragment mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
 
         if(mapInputFragment !=null){
-
-            if(crimeLocationsRequestModel == null){
-                mapInputFragment.progressDialog.cancel();
-            } else {
-                mapInputFragment.DrawResultsMarkersTest(crimeLocationsRequestModel);
+            if(progressDialog != null){
+                progressDialog.cancel();
             }
+            mapInputFragment.ProcessNewRequestResults(crimeLocationsRequestModel);
+
         }
+    }
 
-
+    private void CreateRequestProgressDialog(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Searching for Crime Locations...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
 }
