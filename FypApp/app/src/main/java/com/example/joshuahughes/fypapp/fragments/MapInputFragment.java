@@ -1,22 +1,21 @@
 package com.example.joshuahughes.fypapp.fragments;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 
-import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.Bundle;
 
+import android.location.Location;
+
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
@@ -53,6 +52,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private CrimeLocationsRequestModel requestModel;
     private LatLng selectedLocation;
     private Integer selectedRadius = 400; //400 is default value;
+    private TextView radiusValueCounter;
 
     private OnFragmentInteractionListener mListener;
     //public ProgressDialog progressDialog;
@@ -117,6 +117,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map_input, container, false);
 
+        //Init radiusValueCounter TextView
+        radiusValueCounter = (TextView) v.findViewById(R.id.radiusValueCounter);
+        radiusValueCounter.setText(Integer.toString(selectedRadius) + 'm');
+
         //Init radiusSeekBar
         radiusSeekBar = (SeekBar) v.findViewById(R.id.radiusSeekBar);
         radiusSeekBar.setMax((radiusMax - radiusMin) / radiusStep);
@@ -178,9 +182,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         //set click event listener
         mMap.setOnMapClickListener(this);
-
-        //enable my location
-        //mMap.setMyLocationEnabled(true);
 
 
         if(selectedLocation != null && selectedRadius != null){
@@ -254,6 +255,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 
         selectedRadius = radiusMin + (progress * radiusStep);
+        radiusValueCounter.setText(Integer.toString(selectedRadius) + 'm');
         UpdateLocationRadiusSize(locationMarker, selectedRadius, true);
 
     }
@@ -375,5 +377,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
 
     }
+
+    //------------------------------------------------//
+    //------------------------------------------------//
+    //------------------------------------------------//
+    //------------------------------------------------//
+
+
 
 }

@@ -28,8 +28,18 @@
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="center"
-            android:text="Search Radius"
+            android:text="Search Radius:"
             android:id="@+id/radiusTitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:minEms="4"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:gravity="center"
+            android:id="@+id/radiusValueCounter" />
 
         <SeekBar
             android:layout_width="match_parent"
