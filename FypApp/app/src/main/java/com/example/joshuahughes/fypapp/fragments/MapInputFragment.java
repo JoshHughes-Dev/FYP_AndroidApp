@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
@@ -47,7 +46,7 @@ import java.util.ArrayList;
  * Use the {@link MapInputFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener {
+public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener{
 
 
     private ArrayList<Marker> resultsMarkers;
