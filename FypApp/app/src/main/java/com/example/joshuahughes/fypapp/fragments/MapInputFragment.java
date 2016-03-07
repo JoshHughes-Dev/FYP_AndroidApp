@@ -4,6 +4,7 @@ package com.example.joshuahughes.fypapp.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -322,10 +323,19 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             LatLng latLng = new LatLng(clm.Location.Latitude, clm.Location.Longitude);
 
-            Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title(clm.Location.Name)
-                    .snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title(clm.Location.Name);
+            markerOptions.snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude);
+
+            float[] distance = new float[2];
+            Location.distanceBetween(latLng.latitude, latLng.longitude, selectedLocation.latitude, selectedLocation.longitude, distance);
+
+            if( distance[0] > selectedRadius ){
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+            }
+
+            Marker marker = mMap.addMarker(markerOptions);
 
             resultsMarkers.add(marker);
         }
