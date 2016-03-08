@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 
 import com.android.volley.DefaultRetryPolicy;
@@ -23,6 +25,7 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 
 
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
+import com.example.joshuahughes.fypapp.fragments.ResultsListFragment;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,7 +38,7 @@ import org.json.JSONObject;
 
 
 
-public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener {
+public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener, ResultsListFragment.OnFragmentInteractionListener {
 
 
     private CrimeLocationTypeModel crimeLocationType;
@@ -44,6 +47,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     public ProgressDialog progressDialog;
 
     protected MapInputFragment mapInputFragment;
+    protected ResultsListFragment resultsListFragment;
     protected Boolean mapViewOpen = true;
 
 
@@ -68,6 +72,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
 
         mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+        resultsListFragment = (ResultsListFragment) getSupportFragmentManager().findFragmentById(R.id.results_list_fragment);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.hide(resultsListFragment);
+        ft.commit();
 
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -97,22 +106,24 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         switch(item.getItemId()){
             case R.id.toggleMapList:
 
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
                 if(mapViewOpen){
                     //change to list
                     item.setIcon(R.drawable.ic_map_white_36px);
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.show(resultsListFragment);
                     ft.hide(mapInputFragment);
-                    ft.commit();
                     mapViewOpen = false;
                 }
                 else{
                     //change to map view
                     item.setIcon(R.drawable.ic_list_white_36px);
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.hide(resultsListFragment);
                     ft.show(mapInputFragment);
-                    ft.commit();
                     mapViewOpen = true;
                 }
+
+                ft.commit();
                 break;
 
             default:
@@ -153,6 +164,13 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     @Override
     public Boolean isConnectedToInternet(){
         return isConnected();
+    }
+
+    // Results list fragment listener implements -------------------------------------------------//
+
+    @Override
+    public void onFragmentInteraction(){
+
     }
 
     //--------------------------------------------------------------------------------------------//
