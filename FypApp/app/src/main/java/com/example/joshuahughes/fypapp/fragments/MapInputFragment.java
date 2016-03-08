@@ -1,41 +1,46 @@
 package com.example.joshuahughes.fypapp.fragments;
 
+import java.util.ArrayList;
 
+import android.Manifest;
 import android.content.Context;
-
-
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-
-
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
-
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
 
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,7 +50,7 @@ import java.util.ArrayList;
  * Use the {@link MapInputFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener{
+public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener, ConnectionCallbacks, OnConnectionFailedListener, View.OnClickListener {
 
 
     private ArrayList<Marker> resultsMarkers;
@@ -55,7 +60,13 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private TextView radiusValueCounter;
 
     private OnFragmentInteractionListener mListener;
-    //public ProgressDialog progressDialog;
+
+    /**
+     * Provides the entry point to Google Play services.
+     */
+    protected GoogleApiClient mGoogleApiClient;
+
+    protected ImageButton myLocationButton;
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
@@ -109,6 +120,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         else{
             selectedRadius = 400;
         }
+
+        //build api client for location services
+        buildGoogleApiClient();
     }
 
     @Override
@@ -131,6 +145,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         mMapView = (MapView) v.findViewById(R.id.googleMap);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
+
+
+        //Init my location button
+        myLocationButton = (ImageButton) v.findViewById(R.id.myLocationButton);
+        myLocationButton.setColorFilter(Color.parseColor("#212121"));
+        myLocationButton.setOnClickListener(this);
 
         try{
             MapsInitializer.initialize(getContext());
@@ -359,6 +379,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             mListener.onMapInputInteraction(selectedLocation, selectedRadius);
         }
         else{
+            //TODO better no internet message
             Toast toast = Toast.makeText(getActivity(), "Can't perform new search without internet connection", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -373,7 +394,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius.getRadius())));
         }
         else{
-            //TODO: some kind of error.
+            //TODO: null error with results passed to fragment
         }
 
     }
@@ -383,6 +404,80 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     //------------------------------------------------//
     //------------------------------------------------//
 
+    @Override
+    public void onClick(View view){
+        mGoogleApiClient.connect();
+    }
+
+
+    /**
+     * Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
+     */
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // Provides a simple way of getting a device's location and is well suited for
+            // applications that do not require a fine-grained location and that do not need location
+            // updates. Gets the best and most recent location currently available, which may be null
+            // in rare cases when a location is not available.
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+            if (mLastLocation != null) {
+                //assign last location to do something
+                Toast.makeText(getActivity(), "location FOUND", Toast.LENGTH_LONG).show();
+                selectedLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                RemoveCurrentResultsMarkers();
+                SetNewLocationMarker(selectedLocation,selectedRadius);
+                NewSearchRequest();
+
+                //disconnect when finished
+                mGoogleApiClient.disconnect();
+            } else {
+                Toast.makeText(getActivity(), "no location detected", Toast.LENGTH_LONG).show();
+                //TODO show message with some kind of problem occured
+            }
+        } else {
+            // Show rationale and request permission.
+            //TODO request permission here
+        }
+
+
+    }
+
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
+        // onConnectionFailed.
+        Log.i("MainInputFragment", "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+        //TODO connection failed message
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason. We call connect() to
+        // attempt to re-establish the connection.
+        Log.i("MainInputFragment", "Connection suspended");
+                mGoogleApiClient.connect();
+    }
 
 
 }

@@ -121,6 +121,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         createErrorDialog(error.toString());
+                        //TODO better error response
                     }
                 }
         );
@@ -137,10 +138,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
-
-
-
-
+    
 
     private String getUrlString(LatLng position, Integer radius){
         String urlString = getString(R.string.baseUrl) +

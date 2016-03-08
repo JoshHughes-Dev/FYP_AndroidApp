@@ -49,5 +49,18 @@
 
     </LinearLayout>
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_mylocation"
+        android:id="@+id/myLocationButton"
+        android:background="@drawable/mapbutton"
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="5dip"
+        android:padding="5dip"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>
