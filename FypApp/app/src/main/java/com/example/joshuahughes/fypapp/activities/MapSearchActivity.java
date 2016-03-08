@@ -1,11 +1,16 @@
 package com.example.joshuahughes.fypapp.activities;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 
 import com.android.volley.DefaultRetryPolicy;
@@ -34,9 +39,13 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
 
     private CrimeLocationTypeModel crimeLocationType;
-    private String urlString;
+    //private String urlString;
     private CrimeLocationsRequestModel crimeLocationsRequestModel;
     public ProgressDialog progressDialog;
+
+    protected MapInputFragment mapInputFragment;
+    protected Boolean mapViewOpen = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +66,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         setTitle(crimeLocationType.Name);
 
+
+        mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+
+
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -67,6 +80,49 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 //        });
 
     }
+
+    //SETS options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu_extra, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+
+
+
+        switch(item.getItemId()){
+            case R.id.toggleMapList:
+
+                if(mapViewOpen){
+                    //change to list
+                    item.setIcon(R.drawable.ic_map_white_36px);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.hide(mapInputFragment);
+                    ft.commit();
+                    mapViewOpen = false;
+                }
+                else{
+                    //change to map view
+                    item.setIcon(R.drawable.ic_list_white_36px);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.show(mapInputFragment);
+                    ft.commit();
+                    mapViewOpen = true;
+                }
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+        return true;
+    }
+
+
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -138,7 +194,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
-    
+
 
     private String getUrlString(LatLng position, Integer radius){
         String urlString = getString(R.string.baseUrl) +
@@ -172,7 +228,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     private void SendMapInputResults(){
         //get map fragment
-        MapInputFragment mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+        //MapInputFragment mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+
 
         if(mapInputFragment !=null){
             if(progressDialog != null){

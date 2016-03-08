@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/toggleMapList"
+        android:icon="@drawable/ic_list_white_36px"
+        android:title="toggle map/list"
+        app:showAsAction="always">
+    </item>
+    <item
+        android:id="@+id/about"
+        android:title="About"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/savedRequests"
+        android:title="Saved requests"
+        app:showAsAction="never">
+    </item>
+</menu>
