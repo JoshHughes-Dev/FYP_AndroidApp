@@ -7,11 +7,30 @@
     android:gravity="center_vertical"
     android:descendantFocusability="blocksDescendants">
 
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/badgeImageView"
+        android:layout_marginRight="10dp"
+        />
+
     <TextView
         android:id="@+id/clName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
         android:layout_weight="1"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Details"
+        android:id="@+id/DetailsButton"
+        android:layout_gravity="center"
+        />
+
 
 </LinearLayout>

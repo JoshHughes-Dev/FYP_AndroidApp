@@ -1,7 +1,6 @@
 package com.example.joshuahughes.fypapp.activities;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
 
 
 import com.android.volley.DefaultRetryPolicy;
@@ -93,7 +90,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 //                        .setAction("Action", null).show();
 //            }
 //        });
-        Log.d("MapSearchActivity", "Oncreate");
     }
 
     //SETS options menu
@@ -155,22 +151,13 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     @Override
     public void onMapInputInteraction(LatLng position, Integer radius) {
-        Log.d("Request", "getting new");
         CreateRequestProgressDialog();
         GetCrimeLocationJson(getUrlString(position, radius));
-
     }
 
     @Override
     public void onMapLoadSavedInstance(){
-        Log.d("Request", "sending existing");
-
-        if(crimeLocationsRequestModel == null){
-            Log.d("MapSearchActivity", "onMapLoad - no model");
-        }
-
         SendMapInputResults();
-
     }
 
 
@@ -184,10 +171,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     @Override
     public void onListLoadSavedInstance(){
-
-        if(crimeLocationsRequestModel == null){
-            Log.d("MapSearchActivity", "onListLoad - no model");
-        }
 
         if(crimeLocationsRequestModel != null){
             SendListViewResults();

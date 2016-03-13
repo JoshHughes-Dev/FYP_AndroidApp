@@ -21,6 +21,7 @@ public class CrimeLocationModel implements Parcelable {
     @SerializedName("badge")
     public int Badge;
 
+
     //COMMAND + N -> Parcelable plugin generated code
 
     @Override
@@ -53,4 +54,7 @@ public class CrimeLocationModel implements Parcelable {
             return new CrimeLocationModel[size];
         }
     };
+
+
+
 }

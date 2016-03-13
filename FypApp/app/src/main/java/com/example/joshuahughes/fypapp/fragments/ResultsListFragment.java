@@ -1,6 +1,7 @@
 package com.example.joshuahughes.fypapp.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.activities.MapSearchActivity;
@@ -21,6 +24,8 @@ import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,10 +35,12 @@ import java.util.ArrayList;
  * Use the {@link ResultsListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ResultsListFragment extends Fragment {
+public class ResultsListFragment extends Fragment  {
 
     private ListView resultsListView;
     private CrimeLocationsAdapter clAdapter;
+    private CrimeLocationsRequestModel requestModel;
+    private TextView noResultsTextView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,7 +66,6 @@ public class ResultsListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) { }
-        Log.d("ResultsListFragement", "onCreate");
     }
 
     @Override
@@ -68,6 +74,9 @@ public class ResultsListFragment extends Fragment {
         View v =   inflater.inflate(R.layout.fragment_results_list, container, false);
 
         resultsListView = (ListView) v.findViewById(R.id.results_list_View);
+
+        noResultsTextView = (TextView) v.findViewById(R.id.noResultsTextView);
+
 
         return v;
     }
@@ -115,22 +124,33 @@ public class ResultsListFragment extends Fragment {
     public void ProcessNewRequestResults(CrimeLocationsRequestModel model){
 
         if(model != null) {
-            CreateListView(model);
+            requestModel = model;
+            CreateListView();
         }
         else{
             //TODO no model?
-            Log.d("asdf", "no model");
+            Log.d("ResultsListFragment", "no model");
         }
 
     }
 
-    private void CreateListView(final CrimeLocationsRequestModel model){
+    private void CreateListView(){
 
-        Context c = getActivity();
-        ArrayList<CrimeLocationModel> asdf = model.CrimeLocations;
-
-        clAdapter = new CrimeLocationsAdapter(c, asdf);
+        noResultsTextView.setVisibility(View.GONE);
+        clAdapter = new CrimeLocationsAdapter(getActivity(), requestModel.CrimeLocations);
         resultsListView.setAdapter(clAdapter);
+
+    }
+
+    private void UpdateSortByDistance(){
+
+    }
+
+    private void UpdateSortByRank(){
+
+    }
+
+    private void ToggleSortOrder(){
 
     }
 }

@@ -121,7 +121,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         //build api client for location services
         buildGoogleApiClient();
 
-        Log.d("MapInputFragement", "onCreate");
     }
 
     @Override
@@ -368,8 +367,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             resultsMarkers.add(marker);
 
-            CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
         }
+
+        CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
 
     }
 
