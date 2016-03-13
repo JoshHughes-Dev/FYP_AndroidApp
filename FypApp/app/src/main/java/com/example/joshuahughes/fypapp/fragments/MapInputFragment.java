@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -52,9 +51,8 @@ import com.google.android.gms.location.LocationServices;
  */
 public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener, ConnectionCallbacks, OnConnectionFailedListener, View.OnClickListener {
 
-
+    CrimeLocationsRequestModel resultsModel;
     private ArrayList<Marker> resultsMarkers;
-    private CrimeLocationsRequestModel requestModel;
     private LatLng selectedLocation;
     private Integer selectedRadius = 400; //400 is default value;
     private TextView radiusValueCounter;
@@ -123,6 +121,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         //build api client for location services
         buildGoogleApiClient();
+
+        Log.d("MapInputFragement", "onCreate");
     }
 
     @Override
@@ -187,6 +187,13 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
+    //have to wait until activity is create before getting results model from parent activity
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        mListener.onMapLoadSavedInstance();
+    }
+
 
     // MAP VIEW implements -----------------------------------------------------------------------//
 
@@ -194,6 +201,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private Marker locationMarker;
     private Circle locationRadius;
     private GoogleMap mMap;
+
 
 
     @Override
@@ -207,7 +215,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         if(selectedLocation != null && selectedRadius != null){
             SetNewLocationMarker(selectedLocation, selectedRadius);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, GetZoomLevel(selectedRadius)));
-            mListener.onMapLoadSavedInstance();
+            //mListener.onMapLoadSavedInstance();
+            ProcessResultsOntoMap();
 
         }
         else{
@@ -338,6 +347,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
 
     private void DrawResultsMarkers(CrimeLocationsRequestModel model){
+
+        int suggestedLocations = 0;
+
         for(int j = 0; j<model.CrimeLocations.size(); j++){
 
             CrimeLocationModel clm = model.CrimeLocations.get(j);
@@ -354,12 +366,16 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             if( distance[0] > selectedRadius ){
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                suggestedLocations++;
             }
 
             Marker marker = mMap.addMarker(markerOptions);
 
             resultsMarkers.add(marker);
+
+            CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
         }
+        
     }
 
     private void RemoveCurrentResultsMarkers(){
@@ -369,7 +385,15 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         resultsMarkers.clear();
     }
 
+    private void CreateResultsNotification(int suggestedLocations, int numberOfResults){
 
+        String message = Integer.toString(numberOfResults - suggestedLocations) + " found";
+        if(suggestedLocations > 0){
+            message += ", " + Integer.toString(suggestedLocations) + " suggested";
+        }
+
+        Toast.makeText(getActivity(), message , Toast.LENGTH_SHORT).show();
+    }
 
     // Request / Response Methods -------------------------------------------------------//
 
@@ -389,14 +413,31 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void ProcessNewRequestResults(CrimeLocationsRequestModel model){
 
         if(model != null){
+            //RemoveCurrentResultsMarkers();
+            //DrawResultsMarkers(model);
+            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius.getRadius())));
+            resultsModel = model;
+            if(mMap != null){
+                ProcessResultsOntoMap();
+            }
+        }
+        else{
+            //TODO: null error with results passed to fragment
+            // or could be no results avaiable yet
+        }
+    }
+
+    private void ProcessResultsOntoMap(){
+
+        if(resultsModel != null){
             RemoveCurrentResultsMarkers();
-            DrawResultsMarkers(model);
+            DrawResultsMarkers(resultsModel);
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius.getRadius())));
         }
         else{
             //TODO: null error with results passed to fragment
+            // or could be no results avaiable yet
         }
-
     }
 
     //------------------------------------------------//

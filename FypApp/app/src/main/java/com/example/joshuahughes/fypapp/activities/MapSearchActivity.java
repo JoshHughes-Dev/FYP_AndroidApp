@@ -42,7 +42,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
 
     private CrimeLocationTypeModel crimeLocationType;
-    //private String urlString;
     private CrimeLocationsRequestModel crimeLocationsRequestModel;
     public ProgressDialog progressDialog;
 
@@ -66,6 +65,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         if (savedInstanceState != null) {
             crimeLocationsRequestModel = savedInstanceState.getParcelable("crimeLocationRequestModel");
+            mapViewOpen = savedInstanceState.getBoolean("mapViewOpen");
+            Log.d("MapSearchActivity", "loaded data from save instance");
         }
 
         setTitle(crimeLocationType.Name);
@@ -75,7 +76,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         resultsListFragment = (ResultsListFragment) getSupportFragmentManager().findFragmentById(R.id.results_list_fragment);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.hide(resultsListFragment);
+        if(mapViewOpen){
+            ft.hide(resultsListFragment);
+        }
+        else{
+            ft.hide(mapInputFragment);
+        }
         ft.commit();
 
 
@@ -87,7 +93,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 //                        .setAction("Action", null).show();
 //            }
 //        });
-
+        Log.d("MapSearchActivity", "Oncreate");
     }
 
     //SETS options menu
@@ -98,10 +104,9 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         return true;
     }
 
+    //Sets option menu handlers
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-
-
 
         switch(item.getItemId()){
             case R.id.toggleMapList:
@@ -141,6 +146,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         //save requestModel
         savedInstanceState.putParcelable("crimeLocationRequestModel", crimeLocationsRequestModel);
+        //save mapViewOpen
+        savedInstanceState.putBoolean("mapViewOpen", mapViewOpen);
 
     }
 
@@ -157,7 +164,13 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     @Override
     public void onMapLoadSavedInstance(){
         Log.d("Request", "sending existing");
+
+        if(crimeLocationsRequestModel == null){
+            Log.d("MapSearchActivity", "onMapLoad - no model");
+        }
+
         SendMapInputResults();
+
     }
 
 
@@ -168,8 +181,17 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     // Results list fragment listener implements -------------------------------------------------//
 
+
     @Override
-    public void onFragmentInteraction(){
+    public void onListLoadSavedInstance(){
+
+        if(crimeLocationsRequestModel == null){
+            Log.d("MapSearchActivity", "onListLoad - no model");
+        }
+
+        if(crimeLocationsRequestModel != null){
+            SendListViewResults();
+        }
 
     }
 
@@ -189,6 +211,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                     public void onResponse(JSONObject response) {
                         crimeLocationsRequestModel = ParseCrimeLocationsRequest(response.toString());
                         SendMapInputResults();
+                        SendListViewResults();
                     }
                 },
                 new Response.ErrorListener() {
@@ -245,18 +268,26 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     }
 
     private void SendMapInputResults(){
-        //get map fragment
-        //MapInputFragment mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
 
-
-        if(mapInputFragment !=null){
+        if(mapInputFragment != null){
             if(progressDialog != null){
                 progressDialog.cancel();
             }
             mapInputFragment.ProcessNewRequestResults(crimeLocationsRequestModel);
-
         }
     }
+
+    private void SendListViewResults(){
+
+        if(resultsListFragment != null){
+            if(progressDialog != null){
+                progressDialog.cancel();
+            }
+            resultsListFragment.ProcessNewRequestResults(crimeLocationsRequestModel);
+        }
+
+    }
+
 
     private void CreateRequestProgressDialog(){
         progressDialog = new ProgressDialog(this);

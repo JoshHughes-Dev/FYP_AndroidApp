@@ -14,8 +14,8 @@
     <string name="title_activity_saved_requests">SavedRequestsActivity</string>
     <string name="title_activity_map_search">MapSearchActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- GOOGLE -->
+    <string name="google_app_id">471501874384</string>
 
 
 </resources>
