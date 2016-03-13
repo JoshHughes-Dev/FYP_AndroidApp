@@ -1,6 +1,7 @@
 package com.example.joshuahughes.fypapp.fragments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.Manifest;
 import android.content.Context;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.adapters.CustomInfoWindowAdapter;
+import com.example.joshuahughes.fypapp.helpers.myHelper;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 
@@ -53,6 +56,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     CrimeLocationsRequestModel resultsModel;
     private ArrayList<Marker> resultsMarkers;
+    protected HashMap<CrimeLocationModel, Marker> resultsModelMarkerMap;
+
+
     private LatLng selectedLocation;
     private Integer selectedRadius = 400; //400 is default value;
     private TextView radiusValueCounter;
@@ -108,6 +114,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         super.onCreate(savedInstanceState);
 
         resultsMarkers = new ArrayList<Marker>();
+        resultsModelMarkerMap = new HashMap<>(); //TODO
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
@@ -205,9 +212,18 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        //set click event listener
+        //set map click event listener
         mMap.setOnMapClickListener(this);
+        //set info window adapter
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this.getContext(), resultsModelMarkerMap));
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                CrimeLocationModel clm = (CrimeLocationModel) myHelper.getKeyFromValue(MapInputFragment.this.resultsModelMarkerMap, marker);
+                Log.d("MapInputFragment", "Start Intent Here for: " + clm.Location.Name);
+            }
+        });
 
         if(selectedLocation != null && selectedRadius != null){
             SetNewLocationMarker(selectedLocation, selectedRadius);
@@ -298,10 +314,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             );
 
             locationRadius = mMap.addCircle(new CircleOptions()
-                    .center(locationMarker.getPosition())
-                    .radius(circleRadius)
-                    .fillColor(0x3033FFFF)
-                    .strokeWidth(2)
+                            .center(locationMarker.getPosition())
+                            .radius(circleRadius)
+                            .fillColor(0x3033FFFF)
+                            .strokeWidth(2)
             );
         }
         else{
@@ -366,6 +382,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             Marker marker = mMap.addMarker(markerOptions);
 
             resultsMarkers.add(marker);
+            resultsModelMarkerMap.put(clm,marker); //TODO
 
         }
 
@@ -378,6 +395,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             resultsMarkers.get(i).remove();
         }
         resultsMarkers.clear();
+
+
+        resultsModelMarkerMap.clear(); //TODO
+
     }
 
     private void CreateResultsNotification(int suggestedLocations, int numberOfResults){

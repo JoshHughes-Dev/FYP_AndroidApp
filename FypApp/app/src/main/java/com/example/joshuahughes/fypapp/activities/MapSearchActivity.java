@@ -187,7 +187,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         //cancel any requests queued
         VolleyQueue.getInstance(this).cancelAllRequests(requestTag);
 
-
+        Log.d("MapSearchActivity", "New Request: " + url);
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
