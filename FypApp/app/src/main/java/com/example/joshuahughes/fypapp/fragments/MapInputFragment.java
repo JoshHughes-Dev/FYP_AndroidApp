@@ -63,7 +63,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      * Provides the entry point to Google Play services.
      */
     protected GoogleApiClient mGoogleApiClient;
-
     protected ImageButton myLocationButton;
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
@@ -203,7 +202,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     private GoogleMap mMap;
 
 
-
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
@@ -215,7 +213,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         if(selectedLocation != null && selectedRadius != null){
             SetNewLocationMarker(selectedLocation, selectedRadius);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, GetZoomLevel(selectedRadius)));
-            //mListener.onMapLoadSavedInstance();
+            //results processed onto map from local pointer when map is ready
+            // (rather than old method of requesting from parent when map ready)
             ProcessResultsOntoMap();
 
         }
@@ -261,7 +260,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     // SEEK BAR implements -----------------------------------------------------------------------//
 
     private SeekBar radiusSeekBar;
-    //private Integer radiusValue = 400;
     final private Integer radiusMin = 50;
     final private Integer radiusMax = 5000;
     final private Integer radiusStep = 1;
@@ -313,7 +311,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
-
     private void UpdateLocationMarkerPosition(LatLng newPoint){
         locationMarker.setPosition(newPoint);
         locationRadius.setCenter(newPoint);
@@ -335,7 +332,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
-
     private int GetZoomLevel(double r){
 
         double radius = r + r / 2;
@@ -344,7 +340,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         return zoomLevel;
     }
-
 
     private void DrawResultsMarkers(CrimeLocationsRequestModel model){
 
@@ -375,7 +370,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
         }
-        
+
     }
 
     private void RemoveCurrentResultsMarkers(){
@@ -397,6 +392,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     // Request / Response Methods -------------------------------------------------------//
 
+    /**
+     * check connected to internet than make new request through interface
+     */
     private void NewSearchRequest(){
 
         if(mListener.isConnectedToInternet()){
@@ -409,13 +407,16 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
-    //Public to allow parent activity to call
+    /**
+     * publicly called from parent activity
+     * saves passed model to fragment for local access
+     * if map is ready and working, process results straight away
+     * (this can get called when fragment ready to receive data from parent but map not ready yet - lifecycle stuff)
+     * @param model
+     */
     public void ProcessNewRequestResults(CrimeLocationsRequestModel model){
 
         if(model != null){
-            //RemoveCurrentResultsMarkers();
-            //DrawResultsMarkers(model);
-            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(locationMarker.getPosition(), GetZoomLevel(locationRadius.getRadius())));
             resultsModel = model;
             if(mMap != null){
                 ProcessResultsOntoMap();
@@ -427,6 +428,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
+    /**
+     * take local results and apply them to map
+     */
     private void ProcessResultsOntoMap(){
 
         if(resultsModel != null){
@@ -440,19 +444,21 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
-    //------------------------------------------------//
-    //------------------------------------------------//
-    //------------------------------------------------//
-    //------------------------------------------------//
 
+    // My location handling methods -----------------------------------------------------//
+
+    /**
+     * Starts google api client connection when custom button clicked
+     *
+     * @param view
+     */
     @Override
     public void onClick(View view){
         mGoogleApiClient.connect();
     }
 
-
     /**
-     * Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
+     * Builds a GoogleApiClient configuration.  The addApi() method used to request the LocationServices API.
      */
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -462,6 +468,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
                 .build();
     }
 
+    /**
+     * makes sure google client disconnects when fragment stops
+     */
     @Override
     public void onStop() {
         super.onStop();
@@ -470,6 +479,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
+    /**
+     * when google api clinet connected, check if location permission granted,
+     * gets last known location and uses this to start a new request and map marker(s) draw
+     * @param connectionHint
+     */
     @Override
     public void onConnected(Bundle connectionHint) {
 
@@ -502,7 +516,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
-
+    /**
+     * google api client connection failed handler
+     * @param result
+     */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
@@ -511,13 +528,16 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         //TODO connection failed message
     }
 
-
+    /**
+     * google api client connection suspended handler
+     * @param cause
+     */
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
         Log.i("MainInputFragment", "Connection suspended");
-                mGoogleApiClient.connect();
+        mGoogleApiClient.connect();
     }
 
 
