@@ -152,7 +152,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     @Override
     public void onMapInputInteraction(LatLng position, Integer radius) {
         CreateRequestProgressDialog();
-        GetCrimeLocationJson(getUrlString(position, radius));
+        GetCrimeLocationJson(position, radius);
     }
 
     @Override
@@ -180,7 +180,9 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     //--------------------------------------------------------------------------------------------//
 
-    private void GetCrimeLocationJson(String url) {
+    private void GetCrimeLocationJson(final LatLng position, Integer radius) {
+
+        String url = getUrlString(position, radius);
 
         //define request tag (for queue purposes)
         final String requestTag = "CRIME_LOCATIONS_REQUEST";
@@ -193,6 +195,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                     @Override
                     public void onResponse(JSONObject response) {
                         crimeLocationsRequestModel = ParseCrimeLocationsRequest(response.toString());
+                        crimeLocationsRequestModel.SetDistanceFromForResults(position);
+                        crimeLocationsRequestModel.SetRankForResults();
                         SendMapInputResults();
                         SendListViewResults();
                     }

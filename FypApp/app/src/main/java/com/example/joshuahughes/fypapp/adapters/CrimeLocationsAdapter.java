@@ -39,11 +39,21 @@ public class CrimeLocationsAdapter extends ArrayAdapter<CrimeLocationModel> {
 
         final CrimeLocationModel model = clArray.get(position);
 
+        TextView rankView = (TextView) rowView.findViewById(R.id.clRank);
+        rankView.setText(Integer.toString(model.Rank));
+
         ImageView badgeImageView = (ImageView) rowView.findViewById(R.id.badgeImageView);
         myHelper.SetBadgeIcon(badgeImageView, model.Badge);
 
         TextView textView = (TextView) rowView.findViewById(R.id.clName);
         textView.setText(model.Location.Name);
+
+        TextView distanceView = (TextView) rowView.findViewById(R.id.clDistance);
+        distanceView.setText(Integer.toString(model.Distance) + " meters away");
+
+        TextView crimesView = (TextView) rowView.findViewById(R.id.clCrimes);
+        crimesView.setText(Integer.toString(model.Crimes.size()) + " crime(s)");
+
 
         Button button = (Button) rowView.findViewById(R.id.DetailsButton);
 

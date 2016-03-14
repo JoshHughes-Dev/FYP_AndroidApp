@@ -368,13 +368,13 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
-            markerOptions.title(clm.Location.Name);
-            markerOptions.snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude);
+            //markerOptions.title(clm.Location.Name);
+            //markerOptions.snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude);
 
-            float[] distance = new float[2];
-            Location.distanceBetween(latLng.latitude, latLng.longitude, selectedLocation.latitude, selectedLocation.longitude, distance);
+            //float[] distance = new float[2];
+            //Location.distanceBetween(latLng.latitude, latLng.longitude, selectedLocation.latitude, selectedLocation.longitude, distance);
 
-            if( distance[0] > selectedRadius ){
+            if( clm.Distance > selectedRadius ){
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                 suggestedLocations++;
             }

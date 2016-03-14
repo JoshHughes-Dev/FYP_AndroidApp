@@ -15,7 +15,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.joshuahughes.fypapp.DistanceComparator;
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.RankComparator;
 import com.example.joshuahughes.fypapp.activities.MapSearchActivity;
 import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter2;
 import com.example.joshuahughes.fypapp.adapters.CrimeLocationsAdapter;
@@ -41,6 +43,9 @@ public class ResultsListFragment extends Fragment  {
     private CrimeLocationsAdapter clAdapter;
     private CrimeLocationsRequestModel requestModel;
     private TextView noResultsTextView;
+    private Boolean ascendingFlag = true; //TODO
+    private Boolean rankLastHit = true;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,6 +82,29 @@ public class ResultsListFragment extends Fragment  {
 
         noResultsTextView = (TextView) v.findViewById(R.id.noResultsTextView);
 
+        Button sortRankButton = (Button) v.findViewById(R.id.sortByRankButton);
+        sortRankButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateSortByRank();
+            }
+        });
+
+        Button sortDistanceButton = (Button) v.findViewById(R.id.sortByDistanceButton);
+        sortDistanceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateSortByDistance();
+            }
+        });
+
+        Button toggleSortButton = (Button) v.findViewById(R.id.toggleSortOrderButton);
+        toggleSortButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleSortOrder();
+            }
+        });
 
         return v;
     }
@@ -143,14 +171,45 @@ public class ResultsListFragment extends Fragment  {
     }
 
     private void UpdateSortByDistance(){
+        if(ascendingFlag){
+            clAdapter.sort(new DistanceComparator());
+        }
+        else{
+            clAdapter.sort(Collections.reverseOrder(new DistanceComparator()));
+        }
 
+        rankLastHit = false;
+
+        clAdapter.notifyDataSetChanged();
     }
 
     private void UpdateSortByRank(){
+        if(ascendingFlag){
+            clAdapter.sort(new RankComparator());
+        }
+        else{
+            clAdapter.sort(Collections.reverseOrder(new RankComparator()));
+        }
+
+        rankLastHit = true;
+
+        clAdapter.notifyDataSetChanged();
 
     }
 
     private void ToggleSortOrder(){
+        if(ascendingFlag){
+            ascendingFlag = false;
+        }
+        else{
+            ascendingFlag = true;
+        }
 
+        if(rankLastHit){
+            UpdateSortByRank();
+        }
+        else{
+            UpdateSortByDistance();
+        }
     }
 }

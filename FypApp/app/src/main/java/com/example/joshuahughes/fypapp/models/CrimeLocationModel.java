@@ -22,6 +22,17 @@ public class CrimeLocationModel implements Parcelable {
     public int Badge;
 
 
+    //-----------------------------------//
+
+    public int Rank;
+
+    //meters
+    public int Distance;
+
+
+    //-----------------------------------//
+
+
     //COMMAND + N -> Parcelable plugin generated code
 
     @Override
