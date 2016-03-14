@@ -70,7 +70,12 @@ public class ResultsListFragment extends Fragment  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) { }
+
+        // Restoring the markers on configuration changes
+        if(savedInstanceState!=null){
+            ascendingFlag = savedInstanceState.getBoolean("ascendingFlag");
+            rankLastHit = savedInstanceState.getBoolean("rankLastHit");
+        }
     }
 
     @Override
@@ -87,6 +92,7 @@ public class ResultsListFragment extends Fragment  {
             @Override
             public void onClick(View v) {
                 UpdateSortByRank();
+                rankLastHit = true;
             }
         });
 
@@ -95,6 +101,7 @@ public class ResultsListFragment extends Fragment  {
             @Override
             public void onClick(View v) {
                 UpdateSortByDistance();
+                rankLastHit = false;
             }
         });
 
@@ -133,6 +140,15 @@ public class ResultsListFragment extends Fragment  {
         mListener = null;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean("ascendingFlag", ascendingFlag);
+        outState.putBoolean("rankLastHit", rankLastHit);
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -146,6 +162,7 @@ public class ResultsListFragment extends Fragment  {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListLoadSavedInstance();
+        void InitDetailsActivityFromListFragment(CrimeLocationModel crimeLocationModel);
     }
 
     //Public to allow parent activity to call
@@ -165,8 +182,19 @@ public class ResultsListFragment extends Fragment  {
     private void CreateListView(){
 
         noResultsTextView.setVisibility(View.GONE);
-        clAdapter = new CrimeLocationsAdapter(getActivity(), requestModel.CrimeLocations);
+        clAdapter = new CrimeLocationsAdapter(getActivity(), requestModel.CrimeLocations, this);
         resultsListView.setAdapter(clAdapter);
+
+        Log.d("ResultsListFragment", "ascending: " + Boolean.toString(ascendingFlag));
+        Log.d("ResultsListFragment", "rank last hit: " + Boolean.toString(rankLastHit));
+
+        //set toggle and sort comparator (remember this is because of orientation change
+        if(rankLastHit){
+            UpdateSortByRank();
+        }
+        else{
+            UpdateSortByDistance();
+        }
 
     }
 
@@ -178,8 +206,6 @@ public class ResultsListFragment extends Fragment  {
             clAdapter.sort(Collections.reverseOrder(new DistanceComparator()));
         }
 
-        rankLastHit = false;
-
         clAdapter.notifyDataSetChanged();
     }
 
@@ -190,8 +216,6 @@ public class ResultsListFragment extends Fragment  {
         else{
             clAdapter.sort(Collections.reverseOrder(new RankComparator()));
         }
-
-        rankLastHit = true;
 
         clAdapter.notifyDataSetChanged();
 
@@ -211,5 +235,10 @@ public class ResultsListFragment extends Fragment  {
         else{
             UpdateSortByDistance();
         }
+    }
+
+    //TODO rename the shit out of this crap
+    public void AdapterCaller(CrimeLocationModel crimeLocationModel){
+        mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
     }
 }

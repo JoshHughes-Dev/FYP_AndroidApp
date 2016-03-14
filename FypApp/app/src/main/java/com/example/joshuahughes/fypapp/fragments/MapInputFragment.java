@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -87,6 +88,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         void onMapInputInteraction(LatLng position, Integer radius);
         void onMapLoadSavedInstance();
         Boolean isConnectedToInternet();
+        void InitDetailsActivityFromMapFragment(CrimeLocationModel crimeLocationModel);
     }
 
     public MapInputFragment() {
@@ -217,11 +219,14 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         //set info window adapter
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this.getContext(), resultsModelMarkerMap));
 
+        //set info window click listener to call interface method to parent activity method
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 CrimeLocationModel clm = (CrimeLocationModel) myHelper.getKeyFromValue(MapInputFragment.this.resultsModelMarkerMap, marker);
+
                 Log.d("MapInputFragment", "Start Intent Here for: " + clm.Location.Name);
+                mListener.InitDetailsActivityFromMapFragment(clm);
             }
         });
 
@@ -368,11 +373,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
-            //markerOptions.title(clm.Location.Name);
-            //markerOptions.snippet(clm.Crimes.size() + " crimes. Lat: " + clm.Location.Latitude + "  Lng: " + clm.Location.Longitude);
-
-            //float[] distance = new float[2];
-            //Location.distanceBetween(latLng.latitude, latLng.longitude, selectedLocation.latitude, selectedLocation.longitude, distance);
 
             if( clm.Distance > selectedRadius ){
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
@@ -395,7 +395,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             resultsMarkers.get(i).remove();
         }
         resultsMarkers.clear();
-
 
         resultsModelMarkerMap.clear(); //TODO
 

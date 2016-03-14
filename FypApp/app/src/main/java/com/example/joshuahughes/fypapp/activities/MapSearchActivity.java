@@ -23,6 +23,7 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.fragments.ResultsListFragment;
+import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,6 +58,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
+        Log.d("MapSearchActivity", "create");
 
         crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
 
@@ -65,6 +67,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             mapViewOpen = savedInstanceState.getBoolean("mapViewOpen");
             Log.d("MapSearchActivity", "loaded data from save instance");
         }
+
 
         setTitle(crimeLocationType.Name);
 
@@ -166,6 +169,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         return isConnected();
     }
 
+    @Override
+    public void InitDetailsActivityFromMapFragment(CrimeLocationModel crimeLocationModel){
+        StartIntentToDetailsActivity(crimeLocationModel);
+    }
+
     // Results list fragment listener implements -------------------------------------------------//
 
 
@@ -175,7 +183,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         if(crimeLocationsRequestModel != null){
             SendListViewResults();
         }
+    }
 
+    @Override
+    public void InitDetailsActivityFromListFragment(CrimeLocationModel crimeLocationModel){
+        StartIntentToDetailsActivity(crimeLocationModel);
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -282,6 +294,13 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
         progressDialog.show();
+    }
+
+
+    protected void StartIntentToDetailsActivity(CrimeLocationModel crimeLocationModel){
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra("selectedCrimeLocationModel",crimeLocationModel);
+        startActivity(intent);
     }
 
 }

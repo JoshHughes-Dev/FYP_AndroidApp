@@ -16,6 +16,7 @@
 
     <!-- GOOGLE -->
     <string name="google_app_id">471501874384</string>
+    <string name="title_activity_details">DetailsActivity</string>
 
 
 </resources>

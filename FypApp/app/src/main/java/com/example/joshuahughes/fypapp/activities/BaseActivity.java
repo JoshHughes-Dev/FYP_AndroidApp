@@ -36,6 +36,9 @@ public class BaseActivity extends AppCompatActivity {
         Intent intent;
 
         switch(item.getItemId()){
+            case android.R.id.home: //always need this to keep activity stack in check
+                this.finish();
+                break;
             case R.id.about:
                 intent = new Intent(this, AboutActivity.class);
                 this.startActivity(intent);
