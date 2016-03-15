@@ -220,7 +220,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                             progressDialog.cancel();
                         }
                         createErrorDialog(error.toString());
-
                         //TODO better error response
                     }
                 }

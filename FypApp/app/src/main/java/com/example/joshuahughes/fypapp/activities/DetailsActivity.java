@@ -6,13 +6,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.adapters.CrimesAdapter;
 import com.example.joshuahughes.fypapp.helpers.myHelper;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,7 +33,10 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback 
     private CrimeLocationModel crimeLocationModel;
     private GoogleMap mMap;
     private TableLayout detailsTable;
+    private ListView crimesListView;
+    private CrimesAdapter crimesAdapter;
     private int numberOfLocationResults = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,18 +52,36 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback 
         crimeLocationModel = intent.getExtras().getParcelable("selectedCrimeLocationModel");
         numberOfLocationResults = intent.getIntExtra("numberOfLocationResults", 1);
 
+        if (savedInstanceState != null) {
+            crimeLocationModel = savedInstanceState.getParcelable("selectedCrimeLocationModel");
+            numberOfLocationResults = savedInstanceState.getInt("numberOfLocationResults");
+            Log.d("DetailsActivity", "loaded data from save instance");
+        }
+
         setTitle(crimeLocationModel.Location.Name);
 
         //Init map fragment
         MapFragment liteMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.details_lite_map);
         liteMapFragment.getMapAsync(this);
 
+        //populate details table
         detailsTable = (TableLayout) findViewById(R.id.tableLayout_details);
-
         createRankDetailTableRow();
         createCrimeDetailTableRow();
         createBadgeDetailTableRow();
         createDistanceDetailTableRow();
+
+        //create crimes list
+        CreateCrimesListView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putParcelable("selectedCrimeLocationModel", crimeLocationModel);
+        savedInstanceState.putInt("numberOfLocationResults", numberOfLocationResults);
+
     }
 
 
@@ -68,13 +92,21 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback 
 
         LatLng locationCoords = new LatLng(crimeLocationModel.Location.Latitude, crimeLocationModel.Location.Longitude);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCoords, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCoords, 16));
 
         mMap.addMarker(new MarkerOptions().position(locationCoords));
 
     }
 
 
+    protected void CreateCrimesListView(){
+
+        crimesListView = (ListView)findViewById(R.id.crimes_listView);
+        crimesAdapter = new CrimesAdapter(this, crimeLocationModel.Crimes);
+        Log.d("DetailsActivity", Integer.toString(crimeLocationModel.Crimes.size()));
+        crimesListView.setAdapter(crimesAdapter);
+
+    }
 
     private void createRankDetailTableRow(){
 
