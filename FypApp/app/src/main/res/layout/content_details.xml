@@ -53,19 +53,40 @@
         android:layout_weight="2"
         android:orientation="vertical">
 
-        <TextView
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Crimes"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Crimes"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="list/graph"
+                android:id="@+id/listGraph_toggleButton"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
 
 
-        <ListView
+        <fragment
+            android:name="com.example.joshuahughes.fypapp.fragments.CrimesListFragment"
+            android:id="@+id/crimes_list_fragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/crimes_listView"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:name="com.example.joshuahughes.fypapp.fragments.CrimeGraphFragment"
+            android:id="@+id/crimes_graph_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
