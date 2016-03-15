@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/clRank"
         android:paddingRight="4dp"
-
         android:text="0"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 

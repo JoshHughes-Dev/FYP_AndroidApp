@@ -216,7 +216,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        if(progressDialog != null){
+                            progressDialog.cancel();
+                        }
                         createErrorDialog(error.toString());
+
                         //TODO better error response
                     }
                 }
@@ -299,7 +303,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     protected void StartIntentToDetailsActivity(CrimeLocationModel crimeLocationModel){
         Intent intent = new Intent(this, DetailsActivity.class);
-        intent.putExtra("selectedCrimeLocationModel",crimeLocationModel);
+        intent.putExtra("selectedCrimeLocationModel", crimeLocationModel);
+        intent.putExtra("numberOfLocationResults", crimeLocationsRequestModel.CrimeLocations.size());
         startActivity(intent);
     }
 

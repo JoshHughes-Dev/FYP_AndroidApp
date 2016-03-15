@@ -400,6 +400,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
+    //TODO
     private void CreateResultsNotification(int suggestedLocations, int numberOfResults){
 
         String message = Integer.toString(numberOfResults - suggestedLocations) + " found";
