@@ -59,14 +59,14 @@ public class CrimeLocationsAdapter extends ArrayAdapter<CrimeLocationModel> {
         crimesView.setText(Integer.toString(model.Crimes.size()) + " crime(s)");
 
 
-        Button button = (Button) rowView.findViewById(R.id.DetailsButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("ResultsListFragment", "start intent");
-                resultsListFragment.AdapterCaller(model);
-            }
-        });
+//        Button button = (Button) rowView.findViewById(R.id.DetailsButton);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("ResultsListFragment", "start intent");
+//                resultsListFragment.AdapterCaller(model);
+//            }
+//        });
 
         return rowView;
 

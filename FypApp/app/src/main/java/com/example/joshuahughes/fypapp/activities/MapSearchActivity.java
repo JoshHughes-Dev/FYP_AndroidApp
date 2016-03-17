@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 import com.android.volley.DefaultRetryPolicy;
@@ -56,6 +57,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_home_white_24px);
 
         Intent intent = getIntent();
         Log.d("MapSearchActivity", "create");
@@ -114,14 +116,14 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
                 if(mapViewOpen){
                     //change to list
-                    item.setIcon(R.drawable.ic_map_white_36px);
+                    item.setIcon(R.drawable.ic_map_white_24px);
                     ft.show(resultsListFragment);
                     ft.hide(mapInputFragment);
                     mapViewOpen = false;
                 }
                 else{
                     //change to map view
-                    item.setIcon(R.drawable.ic_list_white_36px);
+                    item.setIcon(R.drawable.ic_list_white_24px);
                     ft.hide(resultsListFragment);
                     ft.show(mapInputFragment);
                     mapViewOpen = true;
@@ -192,7 +194,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     //--------------------------------------------------------------------------------------------//
 
-    private void GetCrimeLocationJson(final LatLng position, Integer radius) {
+    private void GetCrimeLocationJson(final LatLng position, final Integer radius) {
 
         String url = getUrlString(position, radius);
 
@@ -211,6 +213,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                         crimeLocationsRequestModel.SetRankForResults();
                         SendMapInputResults();
                         SendListViewResults();
+
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -275,9 +279,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             if(progressDialog != null){
                 progressDialog.cancel();
             }
-            mapInputFragment.ProcessNewRequestResults(crimeLocationsRequestModel);
+            mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel);
         }
     }
+
 
     private void SendListViewResults(){
 
@@ -306,5 +311,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         intent.putExtra("numberOfLocationResults", crimeLocationsRequestModel.CrimeLocations.size());
         startActivity(intent);
     }
+
+
 
 }

@@ -9,88 +9,10 @@
     tools:showIn="@layout/activity_details"
     android:orientation="vertical">
 
-    <!-- label as frgament or seperate xml-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:orientation="vertical">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
-            android:name="com.google.android.gms.maps.MapFragment"
-            android:id="@+id/details_lite_map"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            tools:ignore="MissingPrefix"
-            map:cameraZoom="16"
-            map:mapType="normal"
-            map:liteMode="true"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tableLayout_details">
-            </TableLayout>
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- label as frgament or seperate xml-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:orientation="vertical">
+    <include layout="@layout/panel_details_1" />
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Crimes"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="list/graph"
-                android:id="@+id/listGraph_toggleButton"
-                android:layout_gravity="center_horizontal" />
-
-        </LinearLayout>
-
-
-        <fragment
-            android:name="com.example.joshuahughes.fypapp.fragments.CrimesListFragment"
-            android:id="@+id/crimes_list_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <fragment
-            android:name="com.example.joshuahughes.fypapp.fragments.CrimeGraphFragment"
-            android:id="@+id/crimes_graph_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
-
-
-
+    <include layout="@layout/panel_details_2" />
 
 </LinearLayout>

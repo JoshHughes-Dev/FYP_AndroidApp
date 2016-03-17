@@ -185,6 +185,17 @@ public class ResultsListFragment extends Fragment  {
         clAdapter = new CrimeLocationsAdapter(getActivity(), requestModel.CrimeLocations, this);
         resultsListView.setAdapter(clAdapter);
 
+        resultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                CrimeLocationModel crimeLocationModel = requestModel.CrimeLocations.get(position);
+                mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
+            }
+        });
+
+
+
         Log.d("ResultsListFragment", "ascending: " + Boolean.toString(ascendingFlag));
         Log.d("ResultsListFragment", "rank last hit: " + Boolean.toString(rankLastHit));
 
@@ -238,7 +249,7 @@ public class ResultsListFragment extends Fragment  {
     }
 
     //TODO rename the shit out of this crap
-    public void AdapterCaller(CrimeLocationModel crimeLocationModel){
-        mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
-    }
+//    public void AdapterCaller(CrimeLocationModel crimeLocationModel){
+//        mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
+//    }
 }

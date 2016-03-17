@@ -65,14 +65,14 @@
 
 
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Details"
-        android:id="@+id/DetailsButton"
-        android:layout_gravity="center"
-        />
+    <!--<Button-->
+        <!--style="?android:attr/buttonStyleSmall"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Details"-->
+        <!--android:id="@+id/DetailsButton"-->
+        <!--android:layout_gravity="center"-->
+        <!--/>-->
 
 
 </LinearLayout>

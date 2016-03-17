@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -44,9 +45,8 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
     private CrimesListFragment crimesListFragment;
     private CrimeGraphFragment crimesGraphFragment;
 
-    //private ViewPager mViewPager;
     private int numberOfLocationResults = 0;
-    private Boolean listOpen = true;
+    private Boolean listOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +99,11 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         ft.commit();
 
 
-        ToggleButton toggleButton = (ToggleButton) findViewById(R.id.listGraph_toggleButton);
+        Button toggleButton = (Button) findViewById(R.id.listGraph_toggleButton);
         toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                temp();
+                ToggleGraphListView();
             }
         });
     }
@@ -212,7 +212,7 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
     }
 
 
-    private void temp(){
+    private void ToggleGraphListView(){
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 

@@ -72,6 +72,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     protected GoogleApiClient mGoogleApiClient;
     protected ImageButton myLocationButton;
 
+    private Boolean newRequestFlag = false;
+
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
     /**
@@ -382,11 +384,14 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             Marker marker = mMap.addMarker(markerOptions);
 
             resultsMarkers.add(marker);
-            resultsModelMarkerMap.put(clm,marker); //TODO
+            resultsModelMarkerMap.put(clm, marker); //TODO
 
         }
 
-        CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
+        if(newRequestFlag) {
+            CreateResultsNotification(suggestedLocations, model.CrimeLocations.size());
+            newRequestFlag = false;
+        }
 
     }
 
@@ -420,6 +425,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         if(mListener.isConnectedToInternet()){
             mListener.onMapInputInteraction(selectedLocation, selectedRadius);
+            newRequestFlag = true;
         }
         else{
             //TODO better no internet message
@@ -435,7 +441,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      * (this can get called when fragment ready to receive data from parent but map not ready yet - lifecycle stuff)
      * @param model
      */
-    public void ProcessNewRequestResults(CrimeLocationsRequestModel model){
+    public void ProcessRequestResults(CrimeLocationsRequestModel model){
 
         if(model != null){
             resultsModel = model;
@@ -464,6 +470,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             // or could be no results avaiable yet
         }
     }
+
 
 
     // My location handling methods -----------------------------------------------------//
