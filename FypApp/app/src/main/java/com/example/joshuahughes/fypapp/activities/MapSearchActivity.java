@@ -2,6 +2,7 @@ package com.example.joshuahughes.fypapp.activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -130,6 +131,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 }
 
                 ft.commit();
+                break;
+
+            case R.id.clearResults:
+                ClearResults();
                 break;
 
             default:
@@ -313,5 +318,28 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     }
 
 
+    //TODO
+    private void ClearResults(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
+
+        builder.setMessage("Are you sure you want to clear search results");
+
+        // Add the buttons
+        builder.setPositiveButton("Clear", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                mapInputFragment.ClearResults();
+                resultsListFragment.ClearResults();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
 }

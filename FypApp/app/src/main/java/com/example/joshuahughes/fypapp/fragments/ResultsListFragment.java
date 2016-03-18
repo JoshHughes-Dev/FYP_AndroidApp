@@ -18,16 +18,12 @@ import android.widget.TextView;
 import com.example.joshuahughes.fypapp.DistanceComparator;
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.RankComparator;
-import com.example.joshuahughes.fypapp.activities.MapSearchActivity;
-import com.example.joshuahughes.fypapp.adapters.CrimeLocationTypesAdapter2;
 import com.example.joshuahughes.fypapp.adapters.CrimeLocationsAdapter;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
-import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -188,16 +184,11 @@ public class ResultsListFragment extends Fragment  {
         resultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 CrimeLocationModel crimeLocationModel = requestModel.CrimeLocations.get(position);
                 mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
             }
         });
 
-
-
-        Log.d("ResultsListFragment", "ascending: " + Boolean.toString(ascendingFlag));
-        Log.d("ResultsListFragment", "rank last hit: " + Boolean.toString(rankLastHit));
 
         //set toggle and sort comparator (remember this is because of orientation change
         if(rankLastHit){
@@ -252,4 +243,12 @@ public class ResultsListFragment extends Fragment  {
 //    public void AdapterCaller(CrimeLocationModel crimeLocationModel){
 //        mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
 //    }
+
+
+    public void ClearResults(){
+        requestModel.CrimeLocations.clear();
+        clAdapter.notifyDataSetChanged();
+        requestModel = null;
+        noResultsTextView.setVisibility(View.VISIBLE);
+    }
 }

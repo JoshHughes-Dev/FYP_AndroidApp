@@ -472,6 +472,24 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     }
 
 
+    public void ClearResults(){
+
+        //remove results from map
+        RemoveCurrentResultsMarkers();
+        //clear local variable
+        resultsModelMarkerMap.clear();
+        //remove marker
+        locationMarker.remove();
+        locationMarker = null;
+        //remove radius
+        locationRadius.remove();
+        locationRadius = null;
+        //clear local variable
+        selectedLocation = null;
+
+        resultsModel = null;
+
+    }
 
     // My location handling methods -----------------------------------------------------//
 
