@@ -5,12 +5,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -25,6 +28,7 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.fragments.ResultsListFragment;
+import com.example.joshuahughes.fypapp.fragments.SaveDialogFragment;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
@@ -38,12 +42,13 @@ import org.json.JSONObject;
 
 
 
-public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener, ResultsListFragment.OnFragmentInteractionListener {
+public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener, ResultsListFragment.OnFragmentInteractionListener, SaveDialogFragment.OnFragmentInteractionListener {
 
 
     private CrimeLocationTypeModel crimeLocationType;
     private CrimeLocationsRequestModel crimeLocationsRequestModel;
     public ProgressDialog progressDialog;
+    private AlertDialog clearResultsDialog;
 
     protected MapInputFragment mapInputFragment;
     protected ResultsListFragment resultsListFragment;
@@ -87,15 +92,23 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
         ft.commit();
 
+        //creates config for clear results dialog
+        CreateClearResultsDialog();
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Will open 'save to favourites' dialog", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+
+        FloatingActionButton saveFab = (FloatingActionButton) findViewById(R.id.saveFab);
+        saveFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(crimeLocationsRequestModel != null) {
+                    CreateSaveDialogFragment();
+                }
+                else{
+                    CreateNothingToDoDialog("save");
+                }
+
+            }
+        });
     }
 
     //SETS options menu
@@ -134,7 +147,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 break;
 
             case R.id.clearResults:
-                ClearResults();
+                if(crimeLocationsRequestModel != null){
+                    clearResultsDialog.show();
+                }
+                else{
+                    CreateNothingToDoDialog("clear");
+                }
                 break;
 
             default:
@@ -143,7 +161,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
         return true;
     }
-
 
 
     @Override
@@ -170,7 +187,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         SendMapInputResults();
     }
 
-
     @Override
     public Boolean isConnectedToInternet(){
         return isConnected();
@@ -183,7 +199,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     // Results list fragment listener implements -------------------------------------------------//
 
-
     @Override
     public void onListLoadSavedInstance(){
 
@@ -195,6 +210,14 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     @Override
     public void InitDetailsActivityFromListFragment(CrimeLocationModel crimeLocationModel){
         StartIntentToDetailsActivity(crimeLocationModel);
+    }
+
+    // Save Dialog fragment listener implements --------------------------------------------------//
+
+    //TODO
+    @Override
+    public void onNewSave(String saveName){
+        Log.d("MapSearchInput", saveName);
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -228,7 +251,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                         if(progressDialog != null){
                             progressDialog.cancel();
                         }
-                        createErrorDialog(error.toString());
+                        CreateErrorDialog(error.toString());
                         //TODO better error response
                     }
                 }
@@ -246,8 +269,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
-
-
     private String getUrlString(LatLng position, Integer radius){
         String urlString = getString(R.string.baseUrl) +
                 getString(R.string.crimeLocationTypesCall) + "/" +
@@ -258,19 +279,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         return urlString;
     }
-
-    private void createErrorDialog(String str){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle("Error");
-        builder.setMessage(str);
-        builder.setCancelable(true);
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-
 
     private CrimeLocationsRequestModel ParseCrimeLocationsRequest(String jsonObject){
         Gson gson = new Gson();
@@ -288,7 +296,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
     }
 
-
     private void SendListViewResults(){
 
         if(resultsListFragment != null){
@@ -300,16 +307,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     }
 
-
-    private void CreateRequestProgressDialog(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Searching for Crime Locations...");
-        progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-    }
-
-
     protected void StartIntentToDetailsActivity(CrimeLocationModel crimeLocationModel){
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("selectedCrimeLocationModel", crimeLocationModel);
@@ -317,9 +314,36 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         startActivity(intent);
     }
 
-
     //TODO
     private void ClearResults(){
+        mapInputFragment.ClearResults();
+        resultsListFragment.ClearResults();
+        crimeLocationsRequestModel = null;
+    }
+
+
+    // DIALOGS -----------------------------------------------------------------------------------//
+
+    private void CreateErrorDialog(String str){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Error");
+        builder.setMessage(str);
+        builder.setCancelable(true);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void CreateRequestProgressDialog(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Searching for locations and associated crime...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    private void CreateClearResultsDialog(){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
 
@@ -328,8 +352,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         // Add the buttons
         builder.setPositiveButton("Clear", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                mapInputFragment.ClearResults();
-                resultsListFragment.ClearResults();
+                ClearResults();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -338,8 +361,28 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        clearResultsDialog = builder.create();
     }
 
+    private void CreateSaveDialogFragment(){
+
+        SaveDialogFragment saveDialogFragment = new SaveDialogFragment();
+
+        saveDialogFragment.show(getFragmentManager(), "Save Dialog Fragment");
+    }
+
+    private void CreateNothingToDoDialog(String todo){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
+
+        builder.setMessage("Nothing to " + todo + ". Use map to start a search");
+        builder.setCancelable(true);
+
+        AlertDialog alertDialog = builder.create();
+
+        alertDialog.show();
+
+    }
+
+    //--------------------------------------------------------------------------------------------//
 }

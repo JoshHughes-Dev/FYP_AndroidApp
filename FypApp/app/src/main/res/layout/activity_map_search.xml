@@ -31,6 +31,6 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_save_white_36px" />
 
+
 </android.support.design.widget.CoordinatorLayout>
 
-    <!--android:layout_margin="@dimen/fab_margin"-->
