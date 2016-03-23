@@ -9,7 +9,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_police_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -48,16 +48,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.joshuahughes.fypapp.activities.DashBoardActivity" />
         </activity>
-
-        <!-- GOOGLE PLAY SERVICES EMBEDDING -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <!-- GOOGLE MAPS API KEY -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAbA5YCLu8kMgLwREWzKtZ4iF4F3Mw7I5M" />
-
         <activity
             android:name=".activities.DetailsActivity"
             android:label="@string/title_activity_details"
@@ -67,6 +57,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.joshuahughes.fypapp.activities.MapSearchActivity" />
         </activity>
+
+
+
+        <!-- GOOGLE PLAY SERVICES EMBEDDING -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <!-- GOOGLE MAPS API KEY -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAbA5YCLu8kMgLwREWzKtZ4iF4F3Mw7I5M" />
     </application>
 
 </manifest>
