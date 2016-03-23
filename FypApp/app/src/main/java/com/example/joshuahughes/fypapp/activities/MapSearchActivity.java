@@ -58,6 +58,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     protected ResultsListFragment resultsListFragment;
     protected Boolean mapViewOpen = true;
 
+    private LatLng testLoc;
+    private Integer testRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +72,15 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_home_white_24px);
 
         Intent intent = getIntent();
-        Log.d("MapSearchActivity", "create");
+
 
         crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
 
-        if(intent.hasExtra("crimeLocationRequestModel")){
+        if(intent.hasExtra("crimeLocationRequestModel") && intent.hasExtra("testLoc") && intent.hasExtra("testRadius")){
+            Log.d("MapSearchActivity", "loading save from intent");
             crimeLocationsRequestModel = intent.getExtras().getParcelable("crimeLocationRequestModel");
+            testLoc = intent.getExtras().getParcelable("testLoc");
+            testRadius = intent.getExtras().getInt("testRadius");
         }
 
 
@@ -88,17 +93,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         //set action bar title
         setTitle(crimeLocationType.Name);
 
-        mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
-        resultsListFragment = (ResultsListFragment) getSupportFragmentManager().findFragmentById(R.id.results_list_fragment);
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if(mapViewOpen){
-            ft.hide(resultsListFragment);
-        }
-        else{
-            ft.hide(mapInputFragment);
-        }
-        ft.commit();
+        //Init fragments
+        InitFragments(savedInstanceState);
 
         //creates config for clear results dialog
         CreateClearResultsDialog();
@@ -181,6 +177,24 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     }
 
+    //-------------------------------------------------------------------------------------------//
+
+    protected void InitFragments(Bundle savedInstance){
+
+        mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
+        resultsListFragment = (ResultsListFragment) getSupportFragmentManager().findFragmentById(R.id.results_list_fragment);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if(mapViewOpen){
+            ft.hide(resultsListFragment);
+        }
+        else{
+            ft.hide(mapInputFragment);
+        }
+        ft.commit();
+    }
+
+
     //Map fragment listener implements ----------------------------------------------------------//
 
     @Override
@@ -208,7 +222,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     @Override
     public void onListLoadSavedInstance(){
-
         if(crimeLocationsRequestModel != null){
             SendListViewResults();
         }
@@ -224,36 +237,41 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     //TODO
     @Override
     public void onNewSave(String saveName){
-        Log.d("MapSearchInput", saveName);
 
-        SaveModel saveModel = new SaveModel();
-        saveModel.Name = saveName;
-        saveModel.SaveDate = new Date();
-        saveModel.CrimeLocationsRequestModel = crimeLocationsRequestModel;
-        saveModel.CrimeLocationTypeModel = crimeLocationType;
-        saveModel.SelectedLocation = mapInputFragment.selectedLocation;
-        saveModel.SelectedRadius = mapInputFragment.selectedRadius;
+        try {
+            SaveModel saveModel = new SaveModel();
+            saveModel.Name = saveName;
+            saveModel.SaveDate = new Date();
+            saveModel.CrimeLocationsRequestModel = crimeLocationsRequestModel;
+            saveModel.CrimeLocationTypeModel = crimeLocationType;
+            saveModel.SelectedLocation = mapInputFragment.selectedLocation;
+            saveModel.SelectedRadius = mapInputFragment.selectedRadius;
 
-        SaveArrayModel saveArrayModel;
+            SaveArrayModel saveArrayModel;
 
-        Gson gson = new Gson();
+            Gson gson = new Gson();
 
-        if(StorageHelper.isSaveArrayDataInSharedPref(this)){
-            Log.d("MapSearchActivity", "existing array");
-            String saveArrayJSON = StorageHelper.RetrieveSaveArrayModelJSON(this).toString();
-            saveArrayModel = gson.fromJson(saveArrayJSON, SaveArrayModel.class);
+            if (StorageHelper.isSaveArrayDataInSharedPref(this)) {
+                Log.d("MapSearchActivity", "existing array");
+                String saveArrayJSON = StorageHelper.RetrieveSaveArrayModelJSON(this).toString();
+                saveArrayModel = gson.fromJson(saveArrayJSON, SaveArrayModel.class);
+            } else {
+                Log.d("MapSearchActivity", "new array");
+                saveArrayModel = new SaveArrayModel();
+                saveArrayModel.SaveModels = new ArrayList<>();
+            }
+
+            saveArrayModel.SaveModels.add(saveModel);
+
+            String jsonString = gson.toJson(saveArrayModel);
+            StorageHelper.StoreSaveArrayModelJSON(this, jsonString);
+
+            CreateSuccessSaveDialog("Request successfully saved");
         }
-        else{
-            Log.d("MapSearchActivity", "new array");
-            saveArrayModel = new SaveArrayModel();
-            saveArrayModel.SaveModels = new ArrayList<>();
+        catch(Exception e){
+            CreateSuccessSaveDialog(e.getMessage());
         }
 
-        saveArrayModel.SaveModels.add(saveModel);
-
-        String jsonString = gson.toJson(saveArrayModel);
-        StorageHelper.StoreSaveArrayModelJSON(this, jsonString);
-        Log.d("MapSearchActivity", jsonString);
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -328,7 +346,14 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             if(progressDialog != null){
                 progressDialog.cancel();
             }
-            mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel);
+
+            if(testLoc != null && testRadius != null){
+                mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel, testLoc, testRadius);
+                testLoc = null;
+                testRadius = null;
+            }else {
+                mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel);
+            }
         }
     }
 
@@ -420,6 +445,16 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         alertDialog.show();
 
+    }
+
+    private void CreateSuccessSaveDialog(String saveMessage){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(saveMessage);
+        builder.setCancelable(true);
+
+        AlertDialog successDialog = builder.create();
+        successDialog.show();
     }
 
     //--------------------------------------------------------------------------------------------//

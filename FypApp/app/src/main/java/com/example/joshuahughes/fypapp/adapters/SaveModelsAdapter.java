@@ -1,6 +1,8 @@
 package com.example.joshuahughes.fypapp.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.activities.DetailsActivity;
+import com.example.joshuahughes.fypapp.activities.SavedRequestsActivity;
 import com.example.joshuahughes.fypapp.models.SaveModel;
 
 
@@ -33,7 +36,7 @@ public class SaveModelsAdapter extends ArrayAdapter<SaveModel> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         LayoutInflater inflator = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -58,6 +61,28 @@ public class SaveModelsAdapter extends ArrayAdapter<SaveModel> {
             @Override
             public void onClick(View v) {
                 Log.d("SaveModelAdapter", "Delete button click");
+
+                AlertDialog.Builder confirmationDialog = new AlertDialog.Builder(getContext());
+                confirmationDialog.setTitle("Warning!");
+                confirmationDialog.setMessage("Are you sure you want to delete saved Request?");
+                confirmationDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveModelArray.remove(position); //or some other task
+                        notifyDataSetChanged();
+                        ((SavedRequestsActivity)context).UpdateSavedModelsStorage();
+                        dialog.dismiss();
+                    }
+                });
+                confirmationDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                confirmationDialog.show();
+
             }
         });
 

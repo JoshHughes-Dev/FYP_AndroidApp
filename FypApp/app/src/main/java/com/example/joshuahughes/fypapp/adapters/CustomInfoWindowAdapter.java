@@ -8,28 +8,31 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.helpers.myHelper;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
-import org.w3c.dom.Text;
-
 import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Created by joshuahughes on 13/03/2016.
  */
 public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
+
     private View view;
     private HashMap<CrimeLocationModel,Marker> resultModelMarkerMap;
+    private MapInputFragment mapInputFragment;
 
-    public CustomInfoWindowAdapter(Context context, HashMap<CrimeLocationModel,Marker> hashMap) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
+    public CustomInfoWindowAdapter(HashMap<CrimeLocationModel,Marker> hashMap, MapInputFragment fragment) {
+
+        LayoutInflater inflater = (LayoutInflater) fragment.getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE);
         view =  inflater.inflate(R.layout.custom_info_window, null);
         resultModelMarkerMap = hashMap;
+        mapInputFragment = fragment;
     }
 
 
@@ -57,6 +60,10 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
             TextView distanceView = (TextView) view.findViewById(R.id.info_window_distance_view);
             distanceView.setText(Integer.toString(clm.Distance) + " meters away");
+
+            //used to track last marker opened
+            mapInputFragment.lastMarkerClicked = marker;
+
         }
         else {
             Log.d("CustomInfoWindowAdapter", "no crime Location model found in hashmap");

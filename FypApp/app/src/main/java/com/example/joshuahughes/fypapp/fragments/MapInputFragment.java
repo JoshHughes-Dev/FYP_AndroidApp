@@ -2,6 +2,8 @@ package com.example.joshuahughes.fypapp.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import android.Manifest;
 import android.content.Context;
@@ -56,9 +58,7 @@ import com.google.android.gms.location.LocationServices;
 public class MapInputFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, SeekBar.OnSeekBarChangeListener, ConnectionCallbacks, OnConnectionFailedListener, View.OnClickListener {
 
     CrimeLocationsRequestModel resultsModel;
-    private ArrayList<Marker> resultsMarkers;
     protected HashMap<CrimeLocationModel, Marker> resultsModelMarkerMap;
-
 
     public LatLng selectedLocation;
     public Integer selectedRadius = 400; //400 is default value;
@@ -72,7 +72,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     protected GoogleApiClient mGoogleApiClient;
     protected ImageButton myLocationButton;
 
+    //used for results toast check
     private Boolean newRequestFlag = false;
+    //used to track if info window open or not
+    public Marker lastMarkerClicked;
+
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
@@ -101,12 +105,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment MapInputFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static MapInputFragment newInstance() {
+        Log.d("MapInputFragment", "newInstance");
         MapInputFragment fragment = new MapInputFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -117,8 +120,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        resultsMarkers = new ArrayList<Marker>();
-        resultsModelMarkerMap = new HashMap<>(); //TODO
+        resultsModelMarkerMap = new HashMap<>();
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
@@ -219,14 +221,13 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         //set map click event listener
         mMap.setOnMapClickListener(this);
         //set info window adapter
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(this.getContext(), resultsModelMarkerMap));
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(resultsModelMarkerMap, this));
 
         //set info window click listener to call interface method to parent activity method
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 CrimeLocationModel clm = (CrimeLocationModel) myHelper.getKeyFromValue(MapInputFragment.this.resultsModelMarkerMap, marker);
-
                 Log.d("MapInputFragment", "Start Intent Here for: " + clm.Location.Name);
                 mListener.InitDetailsActivityFromMapFragment(clm);
             }
@@ -248,11 +249,18 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     }
 
     @Override
-    public void onMapClick(LatLng point){
-        selectedLocation = point;
-        RemoveCurrentResultsMarkers();
-        SetNewLocationMarker(selectedLocation,selectedRadius);
-        NewSearchRequest();
+    public void onMapClick(LatLng point) {
+        //if a marker clicked, then info window opened. needs to be closed before trying a new search
+        if (lastMarkerClicked != null) {
+            lastMarkerClicked.hideInfoWindow();
+            lastMarkerClicked = null;
+        }
+        else{
+            selectedLocation = point;
+            RemoveCurrentResultsMarkers();
+            SetNewLocationMarker(selectedLocation, selectedRadius);
+            NewSearchRequest();
+        }
     }
 
     @Override
@@ -294,7 +302,6 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         if(locationMarker != null) {
             NewSearchRequest();
         }
-
     }
 
     @Override
@@ -383,8 +390,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             Marker marker = mMap.addMarker(markerOptions);
 
-            resultsMarkers.add(marker);
-            resultsModelMarkerMap.put(clm, marker); //TODO
+            resultsModelMarkerMap.put(clm, marker);
 
         }
 
@@ -396,13 +402,18 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     }
 
     private void RemoveCurrentResultsMarkers(){
-        for(int i = 0; i< resultsMarkers.size(); i++){
-            resultsMarkers.get(i).remove();
+
+        //iterate over to clear marker object from map (REQUIRED)
+        Iterator<Map.Entry<CrimeLocationModel, Marker>> iterator = resultsModelMarkerMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<CrimeLocationModel, Marker> pair = iterator.next();
+            Marker marker = pair.getValue();
+            marker.remove();
+            iterator.remove(); // avoids a ConcurrentModificationException
         }
-        resultsMarkers.clear();
 
-        resultsModelMarkerMap.clear(); //TODO
-
+        //finally remove all elements from map
+        resultsModelMarkerMap.clear();
     }
 
     //TODO
@@ -453,6 +464,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             //TODO: null error with results passed to fragment
             // or could be no results avaiable yet
         }
+    }
+
+    public void ProcessRequestResults(CrimeLocationsRequestModel model, LatLng location, int radius){
+        selectedLocation = location;
+        selectedRadius = radius;
+        ProcessRequestResults(model);
     }
 
     /**

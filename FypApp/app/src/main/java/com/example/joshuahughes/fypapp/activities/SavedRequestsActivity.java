@@ -74,8 +74,9 @@ public class SavedRequestsActivity extends BaseActivity {
                 StartIntentToDetailsActivity(saveModel);
             }
         });
-    }
 
+
+    }
 
     private SaveArrayModel createSaveArrayModelObject (String jsonObject){
 
@@ -89,7 +90,17 @@ public class SavedRequestsActivity extends BaseActivity {
         Intent intent = new Intent(this, MapSearchActivity.class);
         intent.putExtra("selectedCrimeLocationType", saveModel.CrimeLocationTypeModel);
         intent.putExtra("crimeLocationRequestModel", saveModel.CrimeLocationsRequestModel);
+        intent.putExtra("testLoc", saveModel.SelectedLocation);
+        intent.putExtra("testRadius", saveModel.SelectedRadius);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);// this clears previous map search activity from stack
         startActivity(intent);
         finish();
+    }
+
+    public void UpdateSavedModelsStorage(){
+
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(saveArrayModel);
+        StorageHelper.StoreSaveArrayModelJSON(this, jsonString);
     }
 }
