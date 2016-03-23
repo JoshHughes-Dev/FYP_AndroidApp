@@ -60,8 +60,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     protected HashMap<CrimeLocationModel, Marker> resultsModelMarkerMap;
 
 
-    private LatLng selectedLocation;
-    private Integer selectedRadius = 400; //400 is default value;
+    public LatLng selectedLocation;
+    public Integer selectedRadius = 400; //400 is default value;
     private TextView radiusValueCounter;
 
     private OnFragmentInteractionListener mListener;

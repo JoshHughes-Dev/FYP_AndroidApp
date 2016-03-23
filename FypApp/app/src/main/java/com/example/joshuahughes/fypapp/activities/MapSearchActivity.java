@@ -74,15 +74,19 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
 
+        if(intent.hasExtra("crimeLocationRequestModel")){
+            crimeLocationsRequestModel = intent.getExtras().getParcelable("crimeLocationRequestModel");
+        }
+
+
         if (savedInstanceState != null) {
             crimeLocationsRequestModel = savedInstanceState.getParcelable("crimeLocationRequestModel");
             mapViewOpen = savedInstanceState.getBoolean("mapViewOpen");
             Log.d("MapSearchActivity", "loaded data from save instance");
         }
 
-
+        //set action bar title
         setTitle(crimeLocationType.Name);
-
 
         mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
         resultsListFragment = (ResultsListFragment) getSupportFragmentManager().findFragmentById(R.id.results_list_fragment);
@@ -98,7 +102,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         //creates config for clear results dialog
         CreateClearResultsDialog();
-
 
         FloatingActionButton saveFab = (FloatingActionButton) findViewById(R.id.saveFab);
         saveFab.setOnClickListener(new View.OnClickListener() {
@@ -228,6 +231,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         saveModel.SaveDate = new Date();
         saveModel.CrimeLocationsRequestModel = crimeLocationsRequestModel;
         saveModel.CrimeLocationTypeModel = crimeLocationType;
+        saveModel.SelectedLocation = mapInputFragment.selectedLocation;
+        saveModel.SelectedRadius = mapInputFragment.selectedRadius;
 
         SaveArrayModel saveArrayModel;
 

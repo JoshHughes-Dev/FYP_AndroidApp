@@ -3,6 +3,7 @@ package com.example.joshuahughes.fypapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
@@ -24,6 +25,12 @@ public class SaveModel implements Parcelable {
     @SerializedName("crimeLocationsRequestModel")
     public CrimeLocationsRequestModel CrimeLocationsRequestModel;
 
+    @SerializedName("selectedLocation")
+    public LatLng SelectedLocation;
+
+    @SerializedName("selectedRadius")
+    public int SelectedRadius;
+
 
     @Override
     public int describeContents() {
@@ -36,6 +43,8 @@ public class SaveModel implements Parcelable {
         dest.writeLong(SaveDate != null ? SaveDate.getTime() : -1);
         dest.writeParcelable(this.CrimeLocationTypeModel, 0);
         dest.writeParcelable(this.CrimeLocationsRequestModel, 0);
+        dest.writeParcelable(this.SelectedLocation, 0);
+        dest.writeInt(this.SelectedRadius);
     }
 
     public SaveModel() {
@@ -47,9 +56,11 @@ public class SaveModel implements Parcelable {
         this.SaveDate = tmpSaveDate == -1 ? null : new Date(tmpSaveDate);
         this.CrimeLocationTypeModel = in.readParcelable(com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel.class.getClassLoader());
         this.CrimeLocationsRequestModel = in.readParcelable(com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel.class.getClassLoader());
+        this.SelectedLocation = in.readParcelable(LatLng.class.getClassLoader());
+        this.SelectedRadius = in.readInt();
     }
 
-    public static final Parcelable.Creator<SaveModel> CREATOR = new Parcelable.Creator<SaveModel>() {
+    public static final Creator<SaveModel> CREATOR = new Creator<SaveModel>() {
         public SaveModel createFromParcel(Parcel source) {
             return new SaveModel(source);
         }
