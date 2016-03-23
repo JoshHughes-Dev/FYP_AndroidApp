@@ -29,17 +29,21 @@ import com.example.joshuahughes.fypapp.VolleyQueue;
 import com.example.joshuahughes.fypapp.fragments.MapInputFragment;
 import com.example.joshuahughes.fypapp.fragments.ResultsListFragment;
 import com.example.joshuahughes.fypapp.fragments.SaveDialogFragment;
+import com.example.joshuahughes.fypapp.helpers.StorageHelper;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
 import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
+import com.example.joshuahughes.fypapp.models.SaveArrayModel;
+import com.example.joshuahughes.fypapp.models.SaveModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 
-
+import org.json.JSONException;
 import org.json.JSONObject;
 
-
+import java.util.ArrayList;
+import java.util.Date;
 
 
 public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener, ResultsListFragment.OnFragmentInteractionListener, SaveDialogFragment.OnFragmentInteractionListener {
@@ -218,6 +222,33 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     @Override
     public void onNewSave(String saveName){
         Log.d("MapSearchInput", saveName);
+
+        SaveModel saveModel = new SaveModel();
+        saveModel.Name = saveName;
+        saveModel.SaveDate = new Date();
+        saveModel.CrimeLocationsRequestModel = crimeLocationsRequestModel;
+        saveModel.CrimeLocationTypeModel = crimeLocationType;
+
+        SaveArrayModel saveArrayModel;
+
+        Gson gson = new Gson();
+
+        if(StorageHelper.isSaveArrayDataInSharedPref(this)){
+            Log.d("MapSearchActivity", "existing array");
+            String saveArrayJSON = StorageHelper.RetrieveSaveArrayModelJSON(this).toString();
+            saveArrayModel = gson.fromJson(saveArrayJSON, SaveArrayModel.class);
+        }
+        else{
+            Log.d("MapSearchActivity", "new array");
+            saveArrayModel = new SaveArrayModel();
+            saveArrayModel.SaveModels = new ArrayList<>();
+        }
+
+        saveArrayModel.SaveModels.add(saveModel);
+
+        String jsonString = gson.toJson(saveArrayModel);
+        StorageHelper.StoreSaveArrayModelJSON(this, jsonString);
+        Log.d("MapSearchActivity", jsonString);
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -366,9 +397,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     private void CreateSaveDialogFragment(){
 
-        SaveDialogFragment saveDialogFragment = new SaveDialogFragment();
+        //null check happens when calling this from outside, should change TODO
+        SaveDialogFragment saveDialogFragment = SaveDialogFragment.newInstance(crimeLocationType, crimeLocationsRequestModel);
 
         saveDialogFragment.show(getFragmentManager(), "Save Dialog Fragment");
+
     }
 
     private void CreateNothingToDoDialog(String todo){

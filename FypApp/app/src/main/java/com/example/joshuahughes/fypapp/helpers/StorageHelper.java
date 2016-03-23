@@ -17,6 +17,8 @@ public class StorageHelper {
 
     private static final String storageLogIdString = "STORAGE_EXCEPTION";
 
+    // -------------------------------------------------------------------------------------------//
+
     private static final String clTypesPrefFileName = "CrimeLocationTypesJSON";
     private static final String clTypesKey = "crimeLocationTypesJson";
     private static final String clTypesObjWrapper = "ClTypesArray";
@@ -31,6 +33,32 @@ public class StorageHelper {
 
     public static Boolean isClTypesDataInSharedPref(Context context){
         return isDataInSharedPrefs(context, clTypesPrefFileName, clTypesKey);
+    }
+
+    // -------------------------------------------------------------------------------------------//
+
+    private static final String saveArrayPrefFileName = "SaveArrayModelJSON";
+    private static final String saveArrayKey = "saveArrayModelJSON";
+
+
+    public static Boolean isSaveArrayDataInSharedPref(Context context){
+        return isDataInSharedPrefs(context, saveArrayPrefFileName, saveArrayKey);
+    }
+
+    public static JSONObject RetrieveSaveArrayModelJSON(Context context){
+        return RetrieveJsonObjectFromSharedPrefs(context, saveArrayPrefFileName, saveArrayKey);
+    }
+
+    public static void StoreSaveArrayModelJSON(Context context, String jsonString){
+
+        try{
+            JSONObject jsonObject = new JSONObject(jsonString);
+            StoreJsonObjectInSharedPrefs(context, saveArrayPrefFileName, saveArrayKey,jsonObject);
+
+        } catch(JSONException e){
+            Log.d("StorageHelper", "bad json object conversion for saveArrayModel");
+        }
+
     }
 
 

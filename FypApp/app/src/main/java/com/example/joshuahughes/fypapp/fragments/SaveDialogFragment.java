@@ -9,12 +9,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.R;
+import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
+import com.example.joshuahughes.fypapp.models.CrimeLocationTypeModel;
+import com.example.joshuahughes.fypapp.models.CrimeLocationsRequestModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,8 +31,11 @@ import com.example.joshuahughes.fypapp.R;
  * Use the {@link SaveDialogFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SaveDialogFragment extends DialogFragment {
+public class SaveDialogFragment extends DialogFragment{
 
+    private CrimeLocationTypeModel crimeLocationTypeModel;
+    private CrimeLocationsRequestModel crimeLocationsRequestModel;
+    private Boolean closeDialog = false;
 
     private OnFragmentInteractionListener mListener;
 
@@ -41,9 +51,11 @@ public class SaveDialogFragment extends DialogFragment {
      * @return A new instance of fragment SaveDialogFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SaveDialogFragment newInstance() {
+    public static SaveDialogFragment newInstance(CrimeLocationTypeModel cltm, CrimeLocationsRequestModel clrm) {
         SaveDialogFragment fragment = new SaveDialogFragment();
         Bundle args = new Bundle();
+        args.putParcelable("crimeLocationTypeModel", cltm);
+        args.putParcelable("crimeLocationsRequestModel", clrm);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +63,10 @@ public class SaveDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) { }
+        if (getArguments() != null) {
+            crimeLocationTypeModel = getArguments().getParcelable("crimeLocationTypeModel");
+            crimeLocationsRequestModel = getArguments().getParcelable("crimeLocationsRequestModel");
+        }
     }
 
 
@@ -64,16 +79,12 @@ public class SaveDialogFragment extends DialogFragment {
         builder.setTitle("Save Search Request");
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.fragment_save_dialog, null));
+        View view = inflater.inflate(R.layout.fragment_save_dialog, null);
+        builder.setView(view);
 
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                    //Save
-                    EditText edit= (EditText) getDialog().findViewById(R.id.save_dialog_save_name);
-                    String text = edit.getText().toString();
-
-                    mListener.onNewSave(text);
-                    dismiss();
+                    //this set in on start override
                 }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -82,6 +93,11 @@ public class SaveDialogFragment extends DialogFragment {
                 }
             });
 
+        TextView resultsDetailsView = (TextView) view.findViewById(R.id.save_dialog_results_details);
+        resultsDetailsView.setText("Type: " +Integer.toString(crimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)");
+
+        TextView typeDetailsView = (TextView) view.findViewById(R.id.save_dialog_type_details);
+        typeDetailsView.setText("Results: " + crimeLocationTypeModel.Name);
 
         return builder.create();
     }
@@ -107,16 +123,41 @@ public class SaveDialogFragment extends DialogFragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
+    //have to set positive button click here to override on start super.
+    @Override
+    public void onStart()
+    {
+        super.onStart();    //super.onStart() is where dialog.show() is actually called on the underlying dialog, so we have to do it after this point
+        AlertDialog d = (AlertDialog)getDialog();
+        if(d != null)
+        {
+            Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    //Save
+                    EditText edit= (EditText) getDialog().findViewById(R.id.save_dialog_save_name);
+                    String text = edit.getText().toString();
+
+                    if(text.length() > 0){
+                        mListener.onNewSave(text);
+                        dismiss();
+                    }
+                    else{
+                        Toast toast = Toast.makeText(getActivity(), "Please enter a name for the request you want to save", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.TOP,0,0);
+                        toast.show();
+                    }
+
+                }
+            });
+        }
+    }
+
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onNewSave(String saveName);
