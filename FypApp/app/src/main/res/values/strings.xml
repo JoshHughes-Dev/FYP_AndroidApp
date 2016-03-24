@@ -1,28 +1,70 @@
 <resources>
     <string name="app_name">Crime-Location App</string>
+
+
     <string name="loadingProgress_InternetConnection">Checking Internet Connection</string>
     <string name="temp_device_connected">device connected</string>
-    <string name="loadingProgress_NoInternetMessage">You dont have an internet connection, the app will run in offline mode (limiting features) until the device can re-connect</string>
+
+
     <string name="title_activity_dash_board">DashBoardActivity</string>
-    <string name="crimeLocationTypesListHeader">Crime-Location Types</string>
-
-
-    <!-- API -->
-    <string name="baseUrl">https://co-web-1.lboro.ac.uk/cojh5web/api</string>
-    <string name="crimeLocationTypesCall">/crimelocation</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_saved_requests">SavedRequestsActivity</string>
     <string name="title_activity_map_search">MapSearchActivity</string>
+    <string name="title_activity_details">DetailsActivity</string>
+
+    <!-- Views -->
+    <string name="dash_board_title_text">Select a Crime-Location Type</string>
+    <string name="click_for_details"><u>click for details</u></string>
+    <string name="start_up_loading_text">Retrieving updates from server&#8230;</string>
+    <!-- /Views -->
+
+
+    <!-- Dialogs/Toasts -->
+    <string name="unable_to_launch_dialog_title">Can\'t Launch Application</string>
+    <string name="unable_to_launch_dialog_message">App requires internet connection for first use, please relaunch app when connected to the internet</string>
+    <string name="unable_to_launch_dialog_positive">Exit</string>
+    <string name="offline_dialog_title">No internet Connection</string>
+    <string name="offline_dialog_message">You don\'t have an internet connection, the app will run in offline mode (limiting features) until the device can re-connect</string>
+    <string name="offline_dialog_positive">Continue</string>
+    <string name="start_up_update_toast_message_success">Crime-Location types successfully updated</string>
+    <string name="start_up_update_toast_message_fail">Failed to get updates from server, saved data used instead.</string>
+    <string name="clear_results_dialog_message">Are you sure you want to clear search results?</string>
+    <string name="clear_results_dialog_positive">Clear</string>
+    <string name="clear_results_dialog_negative">Cancel</string>
+    <string name="request_progress_dialog_message">Searching for locations and associated crime...</string>
+    <string name="request_error_dialog_title">Error</string>
+    <string name="save_completion_title_error">Error saving</string>
+    <string name="save_completion_message_error">Request couldnt be saved</string>
+    <string name="save_completion_message_success">Request was successfully saved</string>
+    <!-- /Dialogs/Toasts -->
+
+    <!-- Intent Extras -->
+    <string name="intent_start_up_error">StartUpError</string>
+    <string name="intent_start_up_update">StartUpUpdate</string>
+    <string name="intent_selected_crimeLocationType">selectedCrimeLocationType</string>
+    <string name="intent_selected_crimeLocationModel">selectedCrimeLocationModel</string>
+    <string name="intent_num_locations">numberOfLocationResults</string>
+    <string name="intent_crimeLocationRequestModel">crimeLocationRequestModel</string>
+    <string name="intent_location_from_save">locationFromSave</string>
+    <string name="intent_radius_from_save">radiusFromSave</string>
+
+    <!-- /Intent Extras -->
+
+    <!-- FYP API -->
+    <string name="baseUrl">https://co-web-1.lboro.ac.uk/cojh5web/api</string>
+    <string name="crimeLocationTypesCall">/crimelocation</string>
+    <!-- /FYP API -->
 
     <!-- GOOGLE -->
     <string name="google_app_id">471501874384</string>
-    <string name="title_activity_details">DetailsActivity</string>
+    <!-- /GOOGLE -->
 
 
-    <string name="click_for_details"><u>click for details</u></string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+
 
 
 </resources>

@@ -48,18 +48,23 @@ import java.util.Date;
 
 public class MapSearchActivity extends BaseActivity implements MapInputFragment.OnFragmentInteractionListener, ResultsListFragment.OnFragmentInteractionListener, SaveDialogFragment.OnFragmentInteractionListener {
 
-
-    private CrimeLocationTypeModel crimeLocationType;
-    private CrimeLocationsRequestModel crimeLocationsRequestModel;
     public ProgressDialog progressDialog;
-    private AlertDialog clearResultsDialog;
-
     protected MapInputFragment mapInputFragment;
     protected ResultsListFragment resultsListFragment;
-    protected Boolean mapViewOpen = true;
 
-    private LatLng testLoc;
-    private Integer testRadius;
+    private Intent intent;
+    private CrimeLocationTypeModel crimeLocationType;
+    private CrimeLocationsRequestModel crimeLocationsRequestModel;
+
+    protected Boolean mapViewOpen = true;
+    private LatLng locationFromSave;
+    private Integer radiusFromSave;
+
+    private static final String TAG = "MapSearchActivity";
+
+    private static final String STATE_SELECTED_CL_TYPE = "selectedCrimeLocationType";
+    private static final String STATE_CL_REQUEST_MODEL = "crimeLocationRequestModel";
+    private static final String STATE_MAP_VIEW_OPEN = "mapViewOpen";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,22 +76,22 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_home_white_24px);
 
-        Intent intent = getIntent();
+        //gets intent
+        intent = getIntent();
 
-
-        crimeLocationType = intent.getExtras().getParcelable("selectedCrimeLocationType");
-
-        if(intent.hasExtra("crimeLocationRequestModel") && intent.hasExtra("testLoc") && intent.hasExtra("testRadius")){
-            Log.d("MapSearchActivity", "loading save from intent");
-            crimeLocationsRequestModel = intent.getExtras().getParcelable("crimeLocationRequestModel");
-            testLoc = intent.getExtras().getParcelable("testLoc");
-            testRadius = intent.getExtras().getInt("testRadius");
+        //Checks intent for selected crime location type, CRITICAL for this activity
+        if(intent.hasExtra(getString(R.string.intent_selected_crimeLocationType))){
+            crimeLocationType = intent.getExtras().getParcelable(getString(R.string.intent_selected_crimeLocationType));
         }
 
+        //Checks if activity was started by intent from Saved Requests by checking and loading data
+        CheckIntentIsLoadingFromSave();
 
+        //gets any data from saved instance if exists
         if (savedInstanceState != null) {
-            crimeLocationsRequestModel = savedInstanceState.getParcelable("crimeLocationRequestModel");
-            mapViewOpen = savedInstanceState.getBoolean("mapViewOpen");
+            crimeLocationType = savedInstanceState.getParcelable(STATE_SELECTED_CL_TYPE);
+            crimeLocationsRequestModel = savedInstanceState.getParcelable(STATE_CL_REQUEST_MODEL);
+            mapViewOpen = savedInstanceState.getBoolean(STATE_MAP_VIEW_OPEN);
             Log.d("MapSearchActivity", "loaded data from save instance");
         }
 
@@ -95,9 +100,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         //Init fragments
         InitFragments(savedInstanceState);
-
-        //creates config for clear results dialog
-        CreateClearResultsDialog();
 
         FloatingActionButton saveFab = (FloatingActionButton) findViewById(R.id.saveFab);
         saveFab.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +153,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
             case R.id.clearResults:
                 if(crimeLocationsRequestModel != null){
-                    clearResultsDialog.show();
+                    CreateClearResultsDialog();
                 }
                 else{
                     CreateNothingToDoDialog("clear");
@@ -170,15 +172,21 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
+        //save current crime location type
+        savedInstanceState.putParcelable(STATE_SELECTED_CL_TYPE, crimeLocationType);
         //save requestModel
-        savedInstanceState.putParcelable("crimeLocationRequestModel", crimeLocationsRequestModel);
+        savedInstanceState.putParcelable(STATE_CL_REQUEST_MODEL, crimeLocationsRequestModel);
         //save mapViewOpen
-        savedInstanceState.putBoolean("mapViewOpen", mapViewOpen);
+        savedInstanceState.putBoolean(STATE_MAP_VIEW_OPEN, mapViewOpen);
 
     }
 
     //-------------------------------------------------------------------------------------------//
 
+    /**
+     * Prepares child fragments including which one displayed first
+     * @param savedInstance
+     */
     protected void InitFragments(Bundle savedInstance){
 
         mapInputFragment = (MapInputFragment) getSupportFragmentManager().findFragmentById(R.id.map_input_fragment);
@@ -234,7 +242,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     // Save Dialog fragment listener implements --------------------------------------------------//
 
-    //TODO
+    /**
+     * Creates new save request,
+     * checks for existing array of saved requests
+     * adds new saved request to array then stores in memory
+     * @param saveName
+     */
     @Override
     public void onNewSave(String saveName){
 
@@ -266,10 +279,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             String jsonString = gson.toJson(saveArrayModel);
             StorageHelper.StoreSaveArrayModelJSON(this, jsonString);
 
-            CreateSuccessSaveDialog("Request successfully saved");
+            CreateSaveCompletionDialog(true);
         }
         catch(Exception e){
-            CreateSuccessSaveDialog(e.getMessage());
+            CreateSaveCompletionDialog(false);
+            //TODO error somewhere
         }
 
     }
@@ -295,8 +309,6 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                         crimeLocationsRequestModel.SetRankForResults();
                         SendMapInputResults();
                         SendListViewResults();
-
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -347,10 +359,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 progressDialog.cancel();
             }
 
-            if(testLoc != null && testRadius != null){
-                mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel, testLoc, testRadius);
-                testLoc = null;
-                testRadius = null;
+            if(locationFromSave != null && radiusFromSave != null){
+                mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel, locationFromSave, radiusFromSave);
+                locationFromSave = null;
+                radiusFromSave = null;
             }else {
                 mapInputFragment.ProcessRequestResults(crimeLocationsRequestModel);
             }
@@ -365,21 +377,25 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             }
             resultsListFragment.ProcessNewRequestResults(crimeLocationsRequestModel);
         }
-
     }
 
     protected void StartIntentToDetailsActivity(CrimeLocationModel crimeLocationModel){
         Intent intent = new Intent(this, DetailsActivity.class);
-        intent.putExtra("selectedCrimeLocationModel", crimeLocationModel);
-        intent.putExtra("numberOfLocationResults", crimeLocationsRequestModel.CrimeLocations.size());
+        intent.putExtra(getString(R.string.intent_selected_crimeLocationModel), crimeLocationModel);
+        intent.putExtra(getString(R.string.intent_num_locations), crimeLocationsRequestModel.CrimeLocations.size());
         startActivity(intent);
     }
 
-    //TODO
+    /**
+     * Clears results data from this activity and child fragments
+     */
     private void ClearResults(){
         mapInputFragment.ClearResults();
         resultsListFragment.ClearResults();
         crimeLocationsRequestModel = null;
+        //should be cleared but double check with these
+        locationFromSave = null;
+        radiusFromSave = null;
     }
 
 
@@ -388,7 +404,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
     private void CreateErrorDialog(String str){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setTitle("Error");
+        builder.setTitle(R.string.request_error_dialog_title);
         builder.setMessage(str);
         builder.setCancelable(true);
 
@@ -398,7 +414,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     private void CreateRequestProgressDialog(){
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Searching for locations and associated crime...");
+        progressDialog.setMessage(getString(R.string.request_progress_dialog_message));
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
         progressDialog.show();
@@ -408,54 +424,82 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
 
-        builder.setMessage("Are you sure you want to clear search results");
+        builder.setMessage(R.string.clear_results_dialog_message);
 
-        // Add the buttons
-        builder.setPositiveButton("Clear", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.clear_results_dialog_positive, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 ClearResults();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.clear_results_dialog_negative, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }
         });
 
-        clearResultsDialog = builder.create();
+        AlertDialog clearResultsDialog = builder.create();
+        clearResultsDialog.show();
     }
 
     private void CreateSaveDialogFragment(){
-
-        //null check happens when calling this from outside, should change TODO
-        SaveDialogFragment saveDialogFragment = SaveDialogFragment.newInstance(crimeLocationType, crimeLocationsRequestModel);
-
-        saveDialogFragment.show(getFragmentManager(), "Save Dialog Fragment");
-
+        if(crimeLocationsRequestModel != null){
+            SaveDialogFragment saveDialogFragment = SaveDialogFragment.newInstance(crimeLocationType, crimeLocationsRequestModel);
+            saveDialogFragment.show(getFragmentManager(), "Save Dialog Fragment");
+        }
     }
 
+    /**
+     * Creates dialog to show user the action they want doesnt do anything
+     * @param todo
+     */
     private void CreateNothingToDoDialog(String todo){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
 
-        builder.setMessage("Nothing to " + todo + ". Use map to start a search");
+        String message = "Nothing to " + todo + ". Use map to start a search";
+
+        builder.setMessage(message);
         builder.setCancelable(true);
 
         AlertDialog alertDialog = builder.create();
-
         alertDialog.show();
 
     }
 
-    private void CreateSuccessSaveDialog(String saveMessage){
+    /**
+     *
+     * @param successfulSave
+     */
+    private void CreateSaveCompletionDialog(boolean successfulSave){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(saveMessage);
+
+        if(successfulSave){
+            builder.setMessage(R.string.save_completion_message_success);
+        }
+        else{
+            builder.setTitle(R.string.save_completion_title_error);
+            builder.setMessage(R.string.save_completion_message_error);
+        }
+
         builder.setCancelable(true);
 
-        AlertDialog successDialog = builder.create();
-        successDialog.show();
+        AlertDialog saveCompletionDialog = builder.create();
+        saveCompletionDialog.show();
     }
 
     //--------------------------------------------------------------------------------------------//
+
+    private void CheckIntentIsLoadingFromSave(){
+        if(intent.hasExtra(getString(R.string.intent_crimeLocationRequestModel))
+                && intent.hasExtra(getString(R.string.intent_location_from_save))
+                && intent.hasExtra(getString(R.string.intent_radius_from_save))){
+
+            Log.d("MapSearchActivity", "loading save from intent");
+            crimeLocationsRequestModel = intent.getExtras().getParcelable(getString(R.string.intent_crimeLocationRequestModel));
+            locationFromSave = intent.getExtras().getParcelable(getString(R.string.intent_location_from_save));
+            radiusFromSave = intent.getExtras().getInt(getString(R.string.intent_radius_from_save));
+        }
+    }
 }
+

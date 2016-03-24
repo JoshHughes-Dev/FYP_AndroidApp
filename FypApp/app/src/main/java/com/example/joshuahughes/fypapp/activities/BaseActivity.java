@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,15 +12,21 @@ import android.view.MenuItem;
 
 import com.example.joshuahughes.fypapp.R;
 
+/**
+ * Base class used for common functionality for most activities
+ */
 public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
-    //SETS options menu
+    /**
+     * Inflates base menu layout
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
@@ -29,14 +34,20 @@ public class BaseActivity extends AppCompatActivity {
         return true;
     }
 
-    //event listener for menu (and whole toolbar?)
+    /**
+     * Base functionality for inflated menu
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
         Intent intent;
 
         switch(item.getItemId()){
-            case android.R.id.home: //always need this to keep activity stack in check
+            //always need this to keep activity stack in check
+            //(removes current from stack when going "back")
+            case android.R.id.home:
                 this.finish();
                 break;
             case R.id.about:
@@ -49,14 +60,17 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
 
         return true;
 
     }
 
-    public boolean isConnected() {
+    /**
+     * Checks application connectivity to a network service (wifi/3G/etc)
+     * @return is/isnt connected
+     */
+    protected boolean isConnected() {
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
