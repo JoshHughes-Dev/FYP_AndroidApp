@@ -77,6 +77,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     //used to track if info window open or not
     public Marker lastMarkerClicked;
 
+    private final static String TAG = "MapInputFragment";
+
+    private final static String STATE_LOCATION = "selectedLocation";
+    private final static String STATE_RADIUS = "selectedRadius";
 
     // MAP INPUT FRAGMENT ------------------------------------------------------------------------//
 
@@ -109,7 +113,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
      */
     // TODO: Rename and change types and number of parameters
     public static MapInputFragment newInstance() {
-        Log.d("MapInputFragment", "newInstance");
+        Log.d(TAG, "newInstance");
         MapInputFragment fragment = new MapInputFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -124,12 +128,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
-            selectedLocation = savedInstanceState.getParcelable("selectedLocation");
-            selectedRadius = savedInstanceState.getInt("selectedRadius");
+            selectedLocation = savedInstanceState.getParcelable(STATE_LOCATION);
+            selectedRadius = savedInstanceState.getInt(STATE_RADIUS);
         }
-        else{
-            selectedRadius = 400;
-        }
+//        else{
+//            selectedRadius = 400;
+//        }
 
         //build api client for location services
         buildGoogleApiClient();
@@ -144,7 +148,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
         //Init radiusValueCounter TextView
         radiusValueCounter = (TextView) v.findViewById(R.id.radiusValueCounter);
-        radiusValueCounter.setText(Integer.toString(selectedRadius) + 'm');
+        String radiusValueText = Integer.toString(selectedRadius) + 'm';
+        radiusValueCounter.setText(radiusValueText);
 
         //Init radiusSeekBar
         radiusSeekBar = (SeekBar) v.findViewById(R.id.radiusSeekBar);
@@ -167,6 +172,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             MapsInitializer.initialize(getContext());
         } catch (Exception e){
             Log.d("MAP_INIT_ERROR",e.toString());
+            //TODO map error stuff
         }
 
         return v;
@@ -193,12 +199,15 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable("selectedLocation", selectedLocation);
-        outState.putInt("selectedRadius", selectedRadius);
+        outState.putParcelable(STATE_LOCATION, selectedLocation);
+        outState.putInt(STATE_RADIUS, selectedRadius);
 
     }
 
-    //have to wait until activity is create before getting results model from parent activity
+    /**
+     * have to wait until activity is create before getting results model from parent activity
+     * @param savedInstanceState
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
@@ -228,7 +237,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             @Override
             public void onInfoWindowClick(Marker marker) {
                 CrimeLocationModel clm = (CrimeLocationModel) myHelper.getKeyFromValue(MapInputFragment.this.resultsModelMarkerMap, marker);
-                Log.d("MapInputFragment", "Start Intent Here for: " + clm.Location.Name);
+                Log.d(TAG, "Start Intent Here for: " + clm.Location.Name);
                 mListener.InitDetailsActivityFromMapFragment(clm);
             }
         });
@@ -290,10 +299,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     // SEEK BAR implements -----------------------------------------------------------------------//
 
     private SeekBar radiusSeekBar;
-    final private Integer radiusMin = 50;
-    final private Integer radiusMax = 5000;
-    final private Integer radiusStep = 1;
-
+    private final Integer radiusMin = 50;
+    private final Integer radiusMax = 5000;
+    private final Integer radiusStep = 1;
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar){
@@ -311,13 +319,19 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 
         selectedRadius = radiusMin + (progress * radiusStep);
-        radiusValueCounter.setText(Integer.toString(selectedRadius) + 'm');
+        String radiusValueText = Integer.toString(selectedRadius) + 'm';
+        radiusValueCounter.setText(radiusValueText);
         UpdateLocationRadiusSize(locationMarker, selectedRadius, true);
 
     }
 
     // MAP DRAWING & MANIPULATION ----------------------------------------//
 
+    /**
+     * Draws new location marker and radius circle
+     * @param point
+     * @param circleRadius
+     */
     private void SetNewLocationMarker(LatLng point, int circleRadius){
 
         if(locationMarker == null) {
@@ -340,11 +354,21 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
+    /**
+     * sets location and radius circle to new point coordinates
+     * @param newPoint
+     */
     private void UpdateLocationMarkerPosition(LatLng newPoint){
         locationMarker.setPosition(newPoint);
         locationRadius.setCenter(newPoint);
     }
 
+    /**
+     * sets/changes circle shape (radius circle) using new values.
+     * @param locationMarker
+     * @param radius
+     * @param inProgress
+     */
     private void UpdateLocationRadiusSize(Marker locationMarker, int radius, Boolean inProgress){
 
         if(locationMarker != null){
@@ -361,15 +385,22 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
+    /**
+     * Gets appropriate google map zoom level for radius value
+     * @param r
+     * @return
+     */
     private int GetZoomLevel(double r){
 
         double radius = r + r / 2;
         double scale = radius / 500;
-        int zoomLevel = (int) (16 - Math.log(scale)/Math.log(2));
-
-        return zoomLevel;
+        return (int) (16 - Math.log(scale)/Math.log(2));
     }
 
+    /**
+     * takes model data and creates and places map markers
+     * @param model
+     */
     private void DrawResultsMarkers(CrimeLocationsRequestModel model){
 
         int suggestedLocations = 0;
@@ -401,6 +432,9 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     }
 
+    /**
+     * Removes results markers from map and removes data from hashmap
+     */
     private void RemoveCurrentResultsMarkers(){
 
         //iterate over to clear marker object from map (REQUIRED)
@@ -416,7 +450,11 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         resultsModelMarkerMap.clear();
     }
 
-    //TODO
+    /**
+     * Creates a toast to quickly notify user summary of results
+     * @param suggestedLocations
+     * @param numberOfResults
+     */
     private void CreateResultsNotification(int suggestedLocations, int numberOfResults){
 
         String message = Integer.toString(numberOfResults - suggestedLocations) + " found";
@@ -440,7 +478,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
         else{
             //TODO better no internet message
-            Toast toast = Toast.makeText(getActivity(), "Can't perform new search without internet connection", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getActivity(), R.string.no_search_without_internet_toast_message, Toast.LENGTH_SHORT);
             toast.show();
         }
     }
@@ -466,6 +504,12 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
+    /**
+     * extended method allows for adding location and radius to fragment (ie when loading from saved data)
+     * @param model
+     * @param location
+     * @param radius
+     */
     public void ProcessRequestResults(CrimeLocationsRequestModel model, LatLng location, int radius){
         selectedLocation = location;
         selectedRadius = radius;
@@ -488,7 +532,10 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         }
     }
 
-
+    /**
+     * public so that can be called by parent activity
+     * Clears all markers and data from fragment
+     */
     public void ClearResults(){
 
         //remove results from map
@@ -559,7 +606,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
             if (mLastLocation != null) {
                 //assign last location to do something
-                Toast.makeText(getActivity(), "location FOUND", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.location_found_toast_message_success, Toast.LENGTH_LONG).show();
                 selectedLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 RemoveCurrentResultsMarkers();
                 SetNewLocationMarker(selectedLocation,selectedRadius);
@@ -568,12 +615,13 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
                 //disconnect when finished
                 mGoogleApiClient.disconnect();
             } else {
-                Toast.makeText(getActivity(), "no location detected", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.location_found_toast_message_fail, Toast.LENGTH_LONG).show();
                 //TODO show message with some kind of problem occured
             }
         } else {
             // Show rationale and request permission.
             //TODO request permission here
+            //http://developer.android.com/training/permissions/requesting.html
         }
 
 

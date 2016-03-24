@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -92,7 +93,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             crimeLocationType = savedInstanceState.getParcelable(STATE_SELECTED_CL_TYPE);
             crimeLocationsRequestModel = savedInstanceState.getParcelable(STATE_CL_REQUEST_MODEL);
             mapViewOpen = savedInstanceState.getBoolean(STATE_MAP_VIEW_OPEN);
-            Log.d("MapSearchActivity", "loaded data from save instance");
+            Log.d(TAG, "loaded data from save instance");
         }
 
         //set action bar title
@@ -116,7 +117,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         });
     }
 
-    //SETS options menu
+    /**
+     * Overrides base method inflating special menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
@@ -124,7 +129,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         return true;
     }
 
-    //Sets option menu handlers
+
+    /**
+     * Overrides base method adding additional menu handlers on top of base functionality
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
@@ -205,29 +215,55 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     //Map fragment listener implements ----------------------------------------------------------//
 
+    /**
+     * Handles map fragment interface listener.
+     * Starts Request for crime locations
+     * @param position
+     * @param radius
+     */
     @Override
     public void onMapInputInteraction(LatLng position, Integer radius) {
         CreateRequestProgressDialog();
         GetCrimeLocationJson(position, radius);
     }
 
+    /**
+     * Handles map fragment interface listener.
+     * sends map fragment relevant data. (part of larger feature where map fragment requests data
+     * from parent activity once its ready rather than during on create
+     */
     @Override
     public void onMapLoadSavedInstance(){
         SendMapInputResults();
     }
 
+    /**
+     * Handles map fragment interface listerner.
+     * Allows map fragment to have access to 'isConnected' base method
+     * @return
+     */
     @Override
     public Boolean isConnectedToInternet(){
         return isConnected();
     }
 
+    /**
+     * Handles map fragment interface listener.
+     * allows map fragment to call this activity to start intent to details activity
+     * @param crimeLocationModel
+     */
     @Override
-    public void InitDetailsActivityFromMapFragment(CrimeLocationModel crimeLocationModel){
+    public void InitDetailsActivityFromMapFragment(CrimeLocationModel crimeLocationModel) {
         StartIntentToDetailsActivity(crimeLocationModel);
     }
 
     // Results list fragment listener implements -------------------------------------------------//
 
+    /**
+     * Handles list  fragment interface listener.
+     * sends list fragment relevant data. (part of larger feature where list fragment requests data
+     * from parent activity once its ready rather than during on create
+     */
     @Override
     public void onListLoadSavedInstance(){
         if(crimeLocationsRequestModel != null){
@@ -235,6 +271,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
     }
 
+    /**
+     * Handles list fragment interface listener.
+     * allows list fragment to call this activity to start intent to details activity
+     * @param crimeLocationModel
+     */
     @Override
     public void InitDetailsActivityFromListFragment(CrimeLocationModel crimeLocationModel){
         StartIntentToDetailsActivity(crimeLocationModel);
@@ -265,11 +306,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
             Gson gson = new Gson();
 
             if (StorageHelper.isSaveArrayDataInSharedPref(this)) {
-                Log.d("MapSearchActivity", "existing array");
+                Log.d(TAG, "existing array");
                 String saveArrayJSON = StorageHelper.RetrieveSaveArrayModelJSON(this).toString();
                 saveArrayModel = gson.fromJson(saveArrayJSON, SaveArrayModel.class);
             } else {
-                Log.d("MapSearchActivity", "new array");
+                Log.d(TAG, "new array");
                 saveArrayModel = new SaveArrayModel();
                 saveArrayModel.SaveModels = new ArrayList<>();
             }
@@ -290,6 +331,11 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     //--------------------------------------------------------------------------------------------//
 
+    /**
+     * Builds and sends request for crime-location request model data
+     * @param position
+     * @param radius
+     */
     private void GetCrimeLocationJson(final LatLng position, final Integer radius) {
 
         String url = getUrlString(position, radius);
@@ -299,7 +345,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         //cancel any requests queued
         VolleyQueue.getInstance(this).cancelAllRequests(requestTag);
 
-        Log.d("MapSearchActivity", "New Request: " + url);
+        Log.d(TAG, "New Request: " + url);
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -335,6 +381,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         VolleyQueue.getInstance(this).addToRequestQueue(getRequest);
     }
 
+    /**
+     * Builds url string for request
+     * @param position
+     * @param radius
+     * @return
+     */
     private String getUrlString(LatLng position, Integer radius){
         String urlString = getString(R.string.baseUrl) +
                 getString(R.string.crimeLocationTypesCall) + "/" +
@@ -346,12 +398,20 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         return urlString;
     }
 
+    /**
+     * Parses "JSON" string to object model using GSON.
+     * @param jsonObject
+     * @return
+     */
     private CrimeLocationsRequestModel ParseCrimeLocationsRequest(String jsonObject){
         Gson gson = new Gson();
         CrimeLocationsRequestModel model = gson.fromJson(jsonObject, CrimeLocationsRequestModel.class);
         return model;
     }
 
+    /**
+     * Sends Map Input Fragment results data using fragment public method
+     */
     private void SendMapInputResults(){
 
         if(mapInputFragment != null){
@@ -369,6 +429,9 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
     }
 
+    /**
+     * Sends List View Fragment results data using fragment public method
+     */
     private void SendListViewResults(){
 
         if(resultsListFragment != null){
@@ -379,6 +442,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         }
     }
 
+    /**
+     * Prepares Intent to Details Activity
+     * @param crimeLocationModel
+     */
     protected void StartIntentToDetailsActivity(CrimeLocationModel crimeLocationModel){
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra(getString(R.string.intent_selected_crimeLocationModel), crimeLocationModel);
@@ -401,6 +468,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     // DIALOGS -----------------------------------------------------------------------------------//
 
+    /**
+     * Creates Error dialog for failed requests
+     * @param str
+     */
     private void CreateErrorDialog(String str){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -412,6 +483,10 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         alertDialog.show();
     }
 
+    /**
+     * Creates Progress Dialog during a request.
+     * TODO improve it
+     */
     private void CreateRequestProgressDialog(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.request_progress_dialog_message));
@@ -420,6 +495,9 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         progressDialog.show();
     }
 
+    /**
+     * Creates Confirmation dialog for "clearing" results
+     */
     private void CreateClearResultsDialog(){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MapSearchActivity.this);
@@ -441,6 +519,9 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
         clearResultsDialog.show();
     }
 
+    /**
+     * Creates SaveDialog Fragment for saving request to memory
+     */
     private void CreateSaveDialogFragment(){
         if(crimeLocationsRequestModel != null){
             SaveDialogFragment saveDialogFragment = SaveDialogFragment.newInstance(crimeLocationType, crimeLocationsRequestModel);
@@ -490,12 +571,15 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
     //--------------------------------------------------------------------------------------------//
 
+    /**
+     * Checks if Intetn has data for loading a request (aka from saved request activity)
+     */
     private void CheckIntentIsLoadingFromSave(){
         if(intent.hasExtra(getString(R.string.intent_crimeLocationRequestModel))
                 && intent.hasExtra(getString(R.string.intent_location_from_save))
                 && intent.hasExtra(getString(R.string.intent_radius_from_save))){
 
-            Log.d("MapSearchActivity", "loading save from intent");
+            Log.d(TAG, "loading save from intent");
             crimeLocationsRequestModel = intent.getExtras().getParcelable(getString(R.string.intent_crimeLocationRequestModel));
             locationFromSave = intent.getExtras().getParcelable(getString(R.string.intent_location_from_save));
             radiusFromSave = intent.getExtras().getInt(getString(R.string.intent_radius_from_save));

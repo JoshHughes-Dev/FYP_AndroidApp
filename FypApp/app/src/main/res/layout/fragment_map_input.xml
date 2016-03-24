@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:gravity="center"
-            android:text="Search Radius:"
+            android:text="@string/map_input_seek_bar_title"
             android:id="@+id/radiusTitle" />
 
         <TextView
@@ -46,7 +46,6 @@
             android:layout_height="match_parent"
             android:id="@+id/radiusSeekBar" />
 
-
     </LinearLayout>
 
     <ImageButton
@@ -61,8 +60,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:contentDescription=""/>
-
+        android:contentDescription="My Location"/>
 
 
 
