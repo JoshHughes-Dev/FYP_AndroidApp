@@ -106,7 +106,11 @@ public class CrimesListFragment extends Fragment {
         mListener.onListLoadSavedInstance();
     }
 
-
+    /**
+     * public allowing parent activity to call it
+     * creates and poulates crime list view
+     * @param model
+     */
     public void CreateCrimesListView(CrimeLocationModel model){
 
         crimeLocationModel = model;

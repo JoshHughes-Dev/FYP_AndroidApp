@@ -48,6 +48,13 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
     private int numberOfLocationResults = 0;
     private Boolean listOpen = false;
 
+    private final static String TAG = "DetailsActivity";
+
+    private final static String STATE_SELECTED_CL_MODEL = "selectedCrimeLocationModel";
+    private final static String STATE_NUM_LOCATIONS = "numberOfLocationResults";
+
+    //--------------------------------------------------------------------------------------------//
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,13 +67,13 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
 
         Intent intent = getIntent();
 
-        crimeLocationModel = intent.getExtras().getParcelable("selectedCrimeLocationModel");
-        numberOfLocationResults = intent.getIntExtra("numberOfLocationResults", 1);
+        crimeLocationModel = intent.getExtras().getParcelable(getString(R.string.intent_selected_crimeLocationModel));
+        numberOfLocationResults = intent.getIntExtra(getString(R.string.intent_num_locations), 1);
 
         if (savedInstanceState != null) {
-            crimeLocationModel = savedInstanceState.getParcelable("selectedCrimeLocationModel");
-            numberOfLocationResults = savedInstanceState.getInt("numberOfLocationResults");
-            Log.d("DetailsActivity", "loaded data from save instance");
+            crimeLocationModel = savedInstanceState.getParcelable(STATE_SELECTED_CL_MODEL);
+            numberOfLocationResults = savedInstanceState.getInt(STATE_NUM_LOCATIONS);
+            Log.d(TAG, "loaded data from save instance");
         }
 
         setTitle(crimeLocationModel.Location.Name);
@@ -113,8 +120,8 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putParcelable("selectedCrimeLocationModel", crimeLocationModel);
-        savedInstanceState.putInt("numberOfLocationResults", numberOfLocationResults);
+        savedInstanceState.putParcelable(STATE_SELECTED_CL_MODEL, crimeLocationModel);
+        savedInstanceState.putInt(STATE_NUM_LOCATIONS, numberOfLocationResults);
 
     }
 
@@ -128,7 +135,7 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         mMap.addMarker(new MarkerOptions().position(locationCoords));
     }
 
-
+    //--------------------------------------------------------------------------------------------//
 
     @Override
     public void onListLoadSavedInstance(){
@@ -140,6 +147,8 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         }
     }
 
+    //--------------------------------------------------------------------------------------------//
+
     @Override
     public void onGraphLoadSavedInstance(){
 
@@ -150,34 +159,47 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         }
     }
 
+    //--------------------------------------------------------------------------------------------//
 
-
+    /**
+     * Populates rank details row
+     */
     private void createRankDetailTableRow(){
 
         View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
 
         TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        detailView.setText("Rank " + Integer.toString(crimeLocationModel.Rank));
+        String detailText = "Rank " + Integer.toString(crimeLocationModel.Rank);
+        detailView.setText(detailText);
 
         TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        detailSubView.setText("...of " + numberOfLocationResults + " results");
+        String detailSubText = "...of " + numberOfLocationResults + " results";
+        detailSubView.setText(detailSubText);
 
         detailsTable.addView(tr);
     }
 
+    /**
+     * Populates crimes details row
+     */
     private void createCrimeDetailTableRow(){
 
         View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
 
         TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        detailView.setText(Integer.toString(crimeLocationModel.Crimes.size())  + " crime(s) recorded");
+        String detailText = Integer.toString(crimeLocationModel.Crimes.size())  + " crime(s) recorded";
+        detailView.setText(detailText);
 
         TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        detailSubView.setText("..in the past 12 months");
+        String detailSubText = "..in the past 12 months";
+        detailSubView.setText(detailSubText);
 
         detailsTable.addView(tr);
     }
 
+    /**
+     * Populates Badge details row
+     */
     private void createBadgeDetailTableRow(){
 
         View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
@@ -196,6 +218,9 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         detailsTable.addView(tr);
     }
 
+    /**
+     * Populates distance details row
+     */
     private void createDistanceDetailTableRow(){
 
         View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
@@ -204,15 +229,19 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
         iconView.setImageResource(R.drawable.ic_pin_drop_24dp);
 
         TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        detailView.setText(Integer.toString(crimeLocationModel.Distance) + " meters");
+        String detailText = Integer.toString(crimeLocationModel.Distance) + " meters";
+        detailView.setText(detailText);
 
         TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        detailSubView.setText("...from starting search point");
+        String detailSubText = "...from starting search point";
+        detailSubView.setText(detailSubText);
 
         detailsTable.addView(tr);
     }
 
-
+    /**
+     * Toggles visibility of graph and list view
+     */
     private void ToggleGraphListView(){
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

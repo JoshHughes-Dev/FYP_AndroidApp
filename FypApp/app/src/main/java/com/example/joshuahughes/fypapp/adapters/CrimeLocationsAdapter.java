@@ -39,7 +39,7 @@ public class CrimeLocationsAdapter extends ArrayAdapter<CrimeLocationModel> {
 
         LayoutInflater inflator = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View rowView = inflator.inflate(R.layout.cl_row, parent, false);
+        View rowView = inflator.inflate(R.layout.list_row_cl, parent, false);
 
         final CrimeLocationModel model = clArray.get(position);
 

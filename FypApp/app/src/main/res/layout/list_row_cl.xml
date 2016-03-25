@@ -43,22 +43,22 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_vertical" >
-                <TextView
-                    android:id="@+id/clDistance"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="distance"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    />
-                <TextView
-                    android:id="@+id/clCrimes"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="crimes"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    />
+            <TextView
+                android:id="@+id/clDistance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="distance"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+            <TextView
+                android:id="@+id/clCrimes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="crimes"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
         </LinearLayout>
 
     </LinearLayout>
@@ -66,13 +66,13 @@
 
 
     <!--<Button-->
-        <!--style="?android:attr/buttonStyleSmall"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Details"-->
-        <!--android:id="@+id/DetailsButton"-->
-        <!--android:layout_gravity="center"-->
-        <!--/>-->
+    <!--style="?android:attr/buttonStyleSmall"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Details"-->
+    <!--android:id="@+id/DetailsButton"-->
+    <!--android:layout_gravity="center"-->
+    <!--/>-->
 
 
 </LinearLayout>

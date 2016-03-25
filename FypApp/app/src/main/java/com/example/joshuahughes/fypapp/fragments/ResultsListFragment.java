@@ -42,8 +42,12 @@ public class ResultsListFragment extends Fragment  {
     private Boolean ascendingFlag = true; //TODO
     private Boolean rankLastHit = true;
 
-
     private OnFragmentInteractionListener mListener;
+
+    private final static String TAG = "ResultsListFragment";
+
+    private final static String STATE_SORT_ASC = "ascendingFlag";
+    private final static String STATE_RANK_SORT_LAST_HIT = "rankLastHit";
 
     public ResultsListFragment() {
         // Required empty public constructor
@@ -67,10 +71,9 @@ public class ResultsListFragment extends Fragment  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Restoring the markers on configuration changes
         if(savedInstanceState!=null){
-            ascendingFlag = savedInstanceState.getBoolean("ascendingFlag");
-            rankLastHit = savedInstanceState.getBoolean("rankLastHit");
+            ascendingFlag = savedInstanceState.getBoolean(STATE_SORT_ASC);
+            rankLastHit = savedInstanceState.getBoolean(STATE_RANK_SORT_LAST_HIT);
         }
     }
 
@@ -140,8 +143,8 @@ public class ResultsListFragment extends Fragment  {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean("ascendingFlag", ascendingFlag);
-        outState.putBoolean("rankLastHit", rankLastHit);
+        outState.putBoolean(STATE_SORT_ASC, ascendingFlag);
+        outState.putBoolean(STATE_RANK_SORT_LAST_HIT, rankLastHit);
 
     }
 
@@ -156,12 +159,15 @@ public class ResultsListFragment extends Fragment  {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListLoadSavedInstance();
         void InitDetailsActivityFromListFragment(CrimeLocationModel crimeLocationModel);
     }
 
-    //Public to allow parent activity to call
+    /**
+     * Public to allow parent activity to call
+     * Initiates creating list view
+     * @param model
+     */
     public void ProcessNewRequestResults(CrimeLocationsRequestModel model){
 
         if(model != null) {
@@ -170,11 +176,14 @@ public class ResultsListFragment extends Fragment  {
         }
         else{
             //TODO no model?
-            Log.d("ResultsListFragment", "no model");
+            Log.d(TAG, "no model");
         }
 
     }
 
+    /**
+     * populates and creates list view
+     */
     private void CreateListView(){
 
         noResultsTextView.setVisibility(View.GONE);
@@ -189,28 +198,31 @@ public class ResultsListFragment extends Fragment  {
             }
         });
 
-
         //set toggle and sort comparator (remember this is because of orientation change
         if(rankLastHit){
             UpdateSortByRank();
-        }
-        else{
+        } else{
             UpdateSortByDistance();
         }
 
     }
 
+    /**
+     * Applies comparator to sort by distance from starting point
+     */
     private void UpdateSortByDistance(){
-        if(ascendingFlag){
+        if(ascendingFlag) {
             clAdapter.sort(new DistanceComparator());
-        }
-        else{
+        } else {
             clAdapter.sort(Collections.reverseOrder(new DistanceComparator()));
         }
 
         clAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Applies comparator to sort by rank
+     */
     private void UpdateSortByRank(){
         if(ascendingFlag){
             clAdapter.sort(new RankComparator());
@@ -223,6 +235,9 @@ public class ResultsListFragment extends Fragment  {
 
     }
 
+    /**
+     * Toggles sort order of list dependent of current sort method being used
+     */
     private void ToggleSortOrder(){
         if(ascendingFlag){
             ascendingFlag = false;
@@ -233,18 +248,15 @@ public class ResultsListFragment extends Fragment  {
 
         if(rankLastHit){
             UpdateSortByRank();
-        }
-        else{
+        } else{
             UpdateSortByDistance();
         }
     }
 
-    //TODO rename the shit out of this crap
-//    public void AdapterCaller(CrimeLocationModel crimeLocationModel){
-//        mListener.InitDetailsActivityFromListFragment(crimeLocationModel);
-//    }
-
-
+    /**
+     * Clears results from fragment.
+     * Public to allow parent acitivty to call it
+     */
     public void ClearResults(){
         requestModel.CrimeLocations.clear();
         clAdapter.notifyDataSetChanged();

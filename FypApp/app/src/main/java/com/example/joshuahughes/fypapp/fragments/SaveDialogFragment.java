@@ -35,9 +35,15 @@ public class SaveDialogFragment extends DialogFragment{
 
     private CrimeLocationTypeModel crimeLocationTypeModel;
     private CrimeLocationsRequestModel crimeLocationsRequestModel;
-    private Boolean closeDialog = false;
 
     private OnFragmentInteractionListener mListener;
+
+    private final static String TAG = "SaveDialogFragment";
+
+    private final static String STATE_CL_TYPE = "crimeLocationTypeModel";
+    private final static String STATE_CL_REQUEST_MODEL = "crimeLocationsRequestModel";
+
+    //--------------------------------------------------------------------------------------------//
 
     public SaveDialogFragment() {
         // Required empty public constructor
@@ -54,8 +60,8 @@ public class SaveDialogFragment extends DialogFragment{
     public static SaveDialogFragment newInstance(CrimeLocationTypeModel cltm, CrimeLocationsRequestModel clrm) {
         SaveDialogFragment fragment = new SaveDialogFragment();
         Bundle args = new Bundle();
-        args.putParcelable("crimeLocationTypeModel", cltm);
-        args.putParcelable("crimeLocationsRequestModel", clrm);
+        args.putParcelable(STATE_CL_TYPE, cltm);
+        args.putParcelable(STATE_CL_REQUEST_MODEL, clrm);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,8 +70,8 @@ public class SaveDialogFragment extends DialogFragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            crimeLocationTypeModel = getArguments().getParcelable("crimeLocationTypeModel");
-            crimeLocationsRequestModel = getArguments().getParcelable("crimeLocationsRequestModel");
+            crimeLocationTypeModel = getArguments().getParcelable(STATE_CL_TYPE);
+            crimeLocationsRequestModel = getArguments().getParcelable(STATE_CL_REQUEST_MODEL);
         }
     }
 
@@ -76,28 +82,30 @@ public class SaveDialogFragment extends DialogFragment{
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle("Save Search Request");
+        builder.setTitle(R.string.save_dialog_title);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_save_dialog, null);
         builder.setView(view);
 
-        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.save_dialog_positive, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                    //this set in on start override
-                }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dismiss();
-                }
-            });
+                //this set in on start override
+            }
+        });
+        builder.setNegativeButton(R.string.save_dialog_negative, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dismiss();
+            }
+        });
 
         TextView resultsDetailsView = (TextView) view.findViewById(R.id.save_dialog_results_details);
-        resultsDetailsView.setText("Type: " +Integer.toString(crimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)");
+        String resultsText = "Results: " + crimeLocationTypeModel.Name;
+        resultsDetailsView.setText(resultsText);
 
         TextView typeDetailsView = (TextView) view.findViewById(R.id.save_dialog_type_details);
-        typeDetailsView.setText("Results: " + crimeLocationTypeModel.Name);
+        String typeText= "Type: " +Integer.toString(crimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)";
+        typeDetailsView.setText(typeText);
 
         return builder.create();
     }
@@ -106,14 +114,10 @@ public class SaveDialogFragment extends DialogFragment{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
-                    + " must implement NoticeDialogListener");
+            throw new ClassCastException(activity.toString() + " must implement NoticeDialogListener");
         }
     }
 
@@ -128,7 +132,8 @@ public class SaveDialogFragment extends DialogFragment{
     @Override
     public void onStart()
     {
-        super.onStart();    //super.onStart() is where dialog.show() is actually called on the underlying dialog, so we have to do it after this point
+        //super.onStart() is where dialog.show() is actually called on the underlying dialog, so we have to do it after this point
+        super.onStart();
         AlertDialog d = (AlertDialog)getDialog();
         if(d != null)
         {
@@ -147,11 +152,10 @@ public class SaveDialogFragment extends DialogFragment{
                         dismiss();
                     }
                     else{
-                        Toast toast = Toast.makeText(getActivity(), "Please enter a name for the request you want to save", Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(getActivity(), R.string.save_validation_toast_message, Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.TOP,0,0);
                         toast.show();
                     }
-
                 }
             });
         }
@@ -159,7 +163,6 @@ public class SaveDialogFragment extends DialogFragment{
 
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onNewSave(String saveName);
     }
 }

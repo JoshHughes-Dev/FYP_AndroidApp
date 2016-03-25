@@ -32,7 +32,7 @@
     <string name="clear_results_dialog_message">Are you sure you want to clear search results?</string>
     <string name="clear_results_dialog_positive">Clear</string>
     <string name="clear_results_dialog_negative">Cancel</string>
-    <string name="request_progress_dialog_message">Searching for locations and associated crime...</string>
+    <string name="request_progress_dialog_message">Searching for locations and associated crime&#8230;</string>
     <string name="request_error_dialog_title">Error</string>
     <string name="save_completion_title_error">Error saving</string>
     <string name="save_completion_message_error">Request couldnt be saved</string>
@@ -40,6 +40,11 @@
     <string name="location_found_toast_message_success">Current location found</string>
     <string name="location_found_toast_message_fail">Couldn\'t get current location</string>
     <string name="no_search_without_internet_toast_message">Can\'t perform new search without internet connection</string>
+    <string name="save_dialog_title">Save Search Request</string>
+    <string name="save_dialog_positive">Save</string>
+    <string name="save_dialog_negative">Cancel</string>
+    <string name="save_validation_toast_message">Please enter a name for the request you want to save</string>
+
     <!-- /Dialogs/Toasts -->
 
     <!-- Intent Extras -->

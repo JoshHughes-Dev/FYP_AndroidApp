@@ -42,14 +42,7 @@ public class CrimeGraphFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
 
-     * @return A new instance of fragment CrimeGraphFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static CrimeGraphFragment newInstance() {
         CrimeGraphFragment fragment = new CrimeGraphFragment();
         Bundle args = new Bundle();
@@ -112,6 +105,11 @@ public class CrimeGraphFragment extends Fragment {
         void onGraphLoadSavedInstance();
     }
 
+    /**
+     * Public so parent can call it
+     * Creates Graphs
+     * @param model
+     */
     public void CreateGraph(CrimeLocationModel model){
         crimeLocationModel = model;
 
@@ -131,6 +129,11 @@ public class CrimeGraphFragment extends Fragment {
 
     }
 
+    /**
+     * create datapoints for graph (position and value)
+     * @param timePeriodList
+     * @return
+     */
     private ArrayList<DataPoint> GetDataPointsFromCrimeLocationModel(ArrayList<Integer> timePeriodList){
         ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
 
@@ -153,6 +156,10 @@ public class CrimeGraphFragment extends Fragment {
         return dataPoints;
     }
 
+    /**
+     * Sets graph settings before creation
+     * @param labels
+     */
     private void setGraphSettings(String[] labels){
 
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graphView);
@@ -166,6 +173,10 @@ public class CrimeGraphFragment extends Fragment {
 
     }
 
+    /**
+     * creates int month in order of last 12 months
+     * @return
+     */
     private ArrayList<Integer> GetTimePeriodIntList(){
 
         ArrayList<Integer> timePeriodList = new ArrayList<>();
@@ -187,6 +198,11 @@ public class CrimeGraphFragment extends Fragment {
         return timePeriodList;
     }
 
+    /**
+     * Converst int months to string months
+     * @param timePeriodList
+     * @return
+     */
     private String[] ConvertIntToStringMonths(ArrayList<Integer> timePeriodList){
 
         ArrayList<String> monthStrs = new ArrayList<String>();
