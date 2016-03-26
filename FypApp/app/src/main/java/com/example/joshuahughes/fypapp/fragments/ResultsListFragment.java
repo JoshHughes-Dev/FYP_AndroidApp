@@ -3,8 +3,10 @@ package com.example.joshuahughes.fypapp.fragments;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.joshuahughes.fypapp.DistanceComparator;
 import com.example.joshuahughes.fypapp.R;
@@ -38,16 +43,19 @@ public class ResultsListFragment extends Fragment  {
     private ListView resultsListView;
     private CrimeLocationsAdapter clAdapter;
     private CrimeLocationsRequestModel requestModel;
+
     private TextView noResultsTextView;
+    private RadioGroup radioGroup;
+    private Button toggleSortButton;
+
     private Boolean ascendingFlag = true; //TODO
-    private Boolean rankLastHit = true;
 
     private OnFragmentInteractionListener mListener;
 
     private final static String TAG = "ResultsListFragment";
 
     private final static String STATE_SORT_ASC = "ascendingFlag";
-    private final static String STATE_RANK_SORT_LAST_HIT = "rankLastHit";
+
 
     public ResultsListFragment() {
         // Required empty public constructor
@@ -73,44 +81,54 @@ public class ResultsListFragment extends Fragment  {
 
         if(savedInstanceState!=null){
             ascendingFlag = savedInstanceState.getBoolean(STATE_SORT_ASC);
-            rankLastHit = savedInstanceState.getBoolean(STATE_RANK_SORT_LAST_HIT);
+            //rankLastHit = savedInstanceState.getBoolean(STATE_RANK_SORT_LAST_HIT);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v =   inflater.inflate(R.layout.fragment_results_list, container, false);
+        final View v = inflater.inflate(R.layout.fragment_results_list, container, false);
 
         resultsListView = (ListView) v.findViewById(R.id.results_list_View);
 
         noResultsTextView = (TextView) v.findViewById(R.id.noResultsTextView);
 
-        Button sortRankButton = (Button) v.findViewById(R.id.sortByRankButton);
-        sortRankButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UpdateSortByRank();
-                rankLastHit = true;
-            }
-        });
+        toggleSortButton = (Button) v.findViewById(R.id.toggleSortOrderButton2);
+        SetToggleButtonUI(ascendingFlag);
 
-        Button sortDistanceButton = (Button) v.findViewById(R.id.sortByDistanceButton);
-        sortDistanceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UpdateSortByDistance();
-                rankLastHit = false;
-            }
-        });
-
-        Button toggleSortButton = (Button) v.findViewById(R.id.toggleSortOrderButton);
         toggleSortButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+//                Drawable drawable;
+//                if(ascendingFlag){
+//                    //change to desc
+//                    toggleSortButton2.setText("Descending");
+//                    drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_down_24dp);
+//                }
+//                else{
+//                    //change to asc
+//                    toggleSortButton2.setText("Ascending");
+//                    drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_up_24dp);
+//                }
+//                toggleSortButton2.setCompoundDrawablesWithIntrinsicBounds(null,null,drawable,null);
+
                 ToggleSortOrder();
+
             }
         });
+
+        radioGroup = (RadioGroup) v.findViewById(R.id.results_list_fragment_sort_radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                UpdateSorting();
+
+            }
+        });
+
 
         return v;
     }
@@ -144,8 +162,6 @@ public class ResultsListFragment extends Fragment  {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_SORT_ASC, ascendingFlag);
-        outState.putBoolean(STATE_RANK_SORT_LAST_HIT, rankLastHit);
-
     }
 
     /**
@@ -198,11 +214,62 @@ public class ResultsListFragment extends Fragment  {
             }
         });
 
-        //set toggle and sort comparator (remember this is because of orientation change
-        if(rankLastHit){
-            UpdateSortByRank();
-        } else{
-            UpdateSortByDistance();
+        UpdateSorting();
+
+    }
+
+
+
+    /**
+     * Toggles sort order of list dependent of current sort method being used
+     */
+    private void ToggleSortOrder(){
+        if(ascendingFlag){
+            ascendingFlag = false;
+        }
+        else{
+            ascendingFlag = true;
+        }
+        SetToggleButtonUI(ascendingFlag);
+
+        UpdateSorting();
+    }
+
+    /**
+     * Clears results from fragment.
+     * Public to allow parent acitivty to call it
+     */
+    public void ClearResults(){
+        requestModel.CrimeLocations.clear();
+        clAdapter.notifyDataSetChanged();
+        requestModel = null;
+        noResultsTextView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * checks radio group for checked sort parameter then applies sort (if adapter not null)
+     */
+    private void UpdateSorting(){
+
+        if(clAdapter != null) {
+
+            int checkedId = radioGroup.getCheckedRadioButtonId();
+
+            switch (checkedId) {
+                case R.id.results_list_fragment_rank_radio:
+                    UpdateSortByRank();
+                    break;
+                case R.id.results_list_fragment_distance_radio:
+                    UpdateSortByDistance();
+                    break;
+                default:
+                    //TODO
+                    break;
+            }
+        }
+        else{
+            Toast toast = Toast.makeText(getActivity(), "Can't do sorting without results!", Toast.LENGTH_SHORT);
+            toast.show();
         }
 
     }
@@ -232,35 +299,24 @@ public class ResultsListFragment extends Fragment  {
         }
 
         clAdapter.notifyDataSetChanged();
-
     }
 
+
     /**
-     * Toggles sort order of list dependent of current sort method being used
+     * Sets toggle button UI (text and icon) dependent on boolean
+     * @param ascending
      */
-    private void ToggleSortOrder(){
-        if(ascendingFlag){
-            ascendingFlag = false;
+    private void SetToggleButtonUI(Boolean ascending){
+
+        Drawable drawable;
+        if(ascending){
+            toggleSortButton.setText("Ascending");
+            drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_up_24dp);
         }
         else{
-            ascendingFlag = true;
+            toggleSortButton.setText("Descending");
+            drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_down_24dp);
         }
-
-        if(rankLastHit){
-            UpdateSortByRank();
-        } else{
-            UpdateSortByDistance();
-        }
-    }
-
-    /**
-     * Clears results from fragment.
-     * Public to allow parent acitivty to call it
-     */
-    public void ClearResults(){
-        requestModel.CrimeLocations.clear();
-        clAdapter.notifyDataSetChanged();
-        requestModel = null;
-        noResultsTextView.setVisibility(View.VISIBLE);
+        toggleSortButton.setCompoundDrawablesWithIntrinsicBounds(null,null,drawable,null);
     }
 }

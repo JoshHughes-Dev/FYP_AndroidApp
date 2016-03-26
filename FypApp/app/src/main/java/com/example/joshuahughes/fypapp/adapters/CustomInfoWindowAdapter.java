@@ -14,6 +14,8 @@ import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
+import org.w3c.dom.Text;
+
 import java.util.HashMap;
 
 
@@ -55,8 +57,12 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             ImageView badgeView = (ImageView) view.findViewById(R.id.info_window_badge_view);
             myHelper.SetBadgeIcon(badgeView, clm.Badge);
 
+            TextView badgeTextView = (TextView) view.findViewById(R.id.info_window_badge_text);
+            String title = myHelper.GetBadgeTitleAndDescription(clm.Badge).get(0);
+            badgeTextView.setText(title);
+
             TextView crimesView = (TextView) view.findViewById(R.id.info_window_crime_number);
-            crimesView.setText(Integer.toString(clm.Crimes.size()) + "crime(s)");
+            crimesView.setText(Integer.toString(clm.Crimes.size()) + " crime(s)");
 
             TextView distanceView = (TextView) view.findViewById(R.id.info_window_distance_view);
             distanceView.setText(Integer.toString(clm.Distance) + " meters away");

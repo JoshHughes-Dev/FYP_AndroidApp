@@ -4,7 +4,7 @@
     android:layout_height="56dp"
     android:paddingLeft="16dp"
     android:paddingRight="4dp"
-    android:gravity="center_vertical"
+    android:gravity="center"
     android:descendantFocusability="blocksDescendants">
 
 
@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:text="Crime-Location Type"
         android:layout_weight="1"
-        style="?android:attr/textAppearanceMedium"/>
+        style="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"/>
 
     <ImageButton
         android:layout_width="56dp"

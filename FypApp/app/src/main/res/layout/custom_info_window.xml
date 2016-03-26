@@ -1,61 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
-    <TableRow
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/locationTitle"
-            android:text=""
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_span="2"
-            android:layout_gravity="center"/>
-    </TableRow>
+        android:id="@+id/locationTitle"
+        android:text="Location Title"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center"
+        android:textColor="@android:color/black"/>
 
-    <TableRow
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/info_window_badge_view"/>
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/info_window_badge_view"
+            android:contentDescription="Badge" />
+
+        <TextView
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_window_badge_text"
+            android:text="badge text"/>
+
+    </LinearLayout>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Medium Text"
+            android:text="0 crime(s)"
+            android:gravity="center"
             android:id="@+id/info_window_crime_number"/>
-    </TableRow>
-    <TableRow
+
+
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="0 meters away"
+        android:gravity="center"
+        android:id="@+id/info_window_distance_view"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Medium Text"
-            android:id="@+id/info_window_distance_view"/>
-    </TableRow>
 
-    <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/click_for_details"
-            android:layout_gravity="center"
-            android:layout_span="2"
-            />
-    </TableRow>
+    <TextView
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/click_for_details"
+        android:textColor="@color/wallet_holo_blue_light"
+        android:gravity="center"/>
 
-</TableLayout>
+
+</LinearLayout>

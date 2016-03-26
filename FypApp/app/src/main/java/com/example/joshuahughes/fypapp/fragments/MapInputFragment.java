@@ -227,6 +227,8 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
         //set map click event listener
         mMap.setOnMapClickListener(this);
         //set info window adapter

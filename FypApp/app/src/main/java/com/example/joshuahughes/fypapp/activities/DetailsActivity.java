@@ -131,7 +131,7 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
 
         LatLng locationCoords = new LatLng(crimeLocationModel.Location.Latitude, crimeLocationModel.Location.Longitude);
         mMap = googleMap;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCoords, 16));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCoords, 17));
         mMap.addMarker(new MarkerOptions().position(locationCoords));
     }
 

@@ -4,34 +4,81 @@
     android:layout_height="match_parent"
     tools:context="com.example.joshuahughes.fypapp.fragments.ResultsListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/listControlsLayout"-->
+        <!--android:orientation="horizontal">-->
+
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Toggle sort order"-->
+            <!--android:id="@+id/toggleSortOrderButton"-->
+            <!--android:layout_weight="1"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Sort by Rank"-->
+            <!--android:id="@+id/sortByRankButton"-->
+            <!--android:layout_weight="1"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Sort by Distance"-->
+            <!--android:id="@+id/sortByDistanceButton"-->
+            <!--android:layout_weight="1"/>-->
+
+
+
+    <!--</LinearLayout>-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listControlsLayout"
-        android:orientation="horizontal">
+        android:id="@+id/listControlsLayoutTest"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:gravity="center">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sort by: "/>
+
+        <RadioGroup
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:id="@+id/results_list_fragment_sort_radio_group">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rank"
+                android:checked="true"
+                android:id="@+id/results_list_fragment_rank_radio"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distance"
+                android:id="@+id/results_list_fragment_distance_radio"/>
+
+        </RadioGroup>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Toggle sort order"
-            android:id="@+id/toggleSortOrderButton"
-            android:layout_weight="1"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sort by Rank"
-            android:id="@+id/sortByRankButton"
-            android:layout_weight="1"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sort by Distance"
-            android:id="@+id/sortByDistanceButton"
-            android:layout_weight="1"/>
+            android:text="Ascending"
+            android:id="@+id/toggleSortOrderButton2"
+            android:drawableRight="@drawable/ic_arrow_sort_up_24dp"
+            style="?borderlessButtonStyle"/>
 
 
     </LinearLayout>
@@ -41,14 +88,14 @@
         android:layout_height="match_parent"
         android:id="@+id/noResultsTextView"
         android:text="No results. Go back to map view to start a search."
-        android:layout_below="@+id/listControlsLayout"
+        android:layout_below="@+id/listControlsLayoutTest"
         android:gravity="center"/>
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/results_list_View"
-        android:layout_below="@+id/listControlsLayout"
+        android:layout_below="@+id/listControlsLayoutTest"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_centerHorizontal="true"
