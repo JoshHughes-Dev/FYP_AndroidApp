@@ -81,7 +81,6 @@ public class ResultsListFragment extends Fragment  {
 
         if(savedInstanceState!=null){
             ascendingFlag = savedInstanceState.getBoolean(STATE_SORT_ASC);
-            //rankLastHit = savedInstanceState.getBoolean(STATE_RANK_SORT_LAST_HIT);
         }
     }
 
@@ -100,22 +99,7 @@ public class ResultsListFragment extends Fragment  {
         toggleSortButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-//                Drawable drawable;
-//                if(ascendingFlag){
-//                    //change to desc
-//                    toggleSortButton2.setText("Descending");
-//                    drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_down_24dp);
-//                }
-//                else{
-//                    //change to asc
-//                    toggleSortButton2.setText("Ascending");
-//                    drawable = getResources().getDrawable(R.drawable.ic_arrow_sort_up_24dp);
-//                }
-//                toggleSortButton2.setCompoundDrawablesWithIntrinsicBounds(null,null,drawable,null);
-
                 ToggleSortOrder();
-
             }
         });
 
@@ -123,9 +107,7 @@ public class ResultsListFragment extends Fragment  {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-
                 UpdateSorting();
-
             }
         });
 

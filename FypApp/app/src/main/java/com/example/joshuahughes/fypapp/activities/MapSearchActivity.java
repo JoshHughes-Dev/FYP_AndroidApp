@@ -340,6 +340,8 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
 
         String url = getUrlString(position, radius);
 
+        Log.d(TAG, url);
+
         //define request tag (for queue purposes)
         final String requestTag = "CRIME_LOCATIONS_REQUEST";
         //cancel any requests queued

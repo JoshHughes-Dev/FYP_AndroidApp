@@ -1,13 +1,11 @@
 package com.example.joshuahughes.fypapp.fragments;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -34,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -227,6 +226,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
+        //removes map toolbar (aka directions buttons in bottom right of map)
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
         //set map click event listener
@@ -319,7 +319,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-
+        Log.d(TAG, "seek bar changed");
         selectedRadius = radiusMin + (progress * radiusStep);
         String radiusValueText = Integer.toString(selectedRadius) + 'm';
         radiusValueCounter.setText(radiusValueText);
@@ -339,15 +339,15 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
         if(locationMarker == null) {
 
             locationMarker = mMap.addMarker(new MarkerOptions()
-                    .position(point)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                .position(point)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
             );
 
             locationRadius = mMap.addCircle(new CircleOptions()
-                            .center(locationMarker.getPosition())
-                            .radius(circleRadius)
-                            .fillColor(0x3033FFFF)
-                            .strokeWidth(2)
+                .center(locationMarker.getPosition())
+                .radius(circleRadius)
+                .fillColor(0x3033FFFF)
+                .strokeWidth(2)
             );
         }
         else{
@@ -515,6 +515,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
     public void ProcessRequestResults(CrimeLocationsRequestModel model, LatLng location, int radius){
         selectedLocation = location;
         selectedRadius = radius;
+        radiusSeekBar.setProgress(radius);
         ProcessRequestResults(model);
     }
 

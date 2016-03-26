@@ -15,7 +15,7 @@
         android:text="Crime-Location Type"
         android:layout_weight="1"
         style="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/primary_text_light"/>
 
     <ImageButton
         android:layout_width="56dp"

@@ -2,14 +2,14 @@
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:minHeight="72dp"
+    android:layout_height="56dp"
+    android:minHeight="56dp"
     android:layout_gravity="center_vertical">
 
 
     <ImageView
         android:layout_height="match_parent"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
         android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
         android:id="@+id/table_row_icon"
@@ -28,14 +28,16 @@
             android:layout_height="wrap_content"
             android:text="detail attribute"
             android:id="@+id/table_row_detail"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/primary_text_light"/>
 
         <TextView
             android:id="@+id/table_row_subDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="sub details"
-            android:textAppearance="?android:attr/textAppearanceSmall"  />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/secondary_text_light"/>
 
     </LinearLayout>
 

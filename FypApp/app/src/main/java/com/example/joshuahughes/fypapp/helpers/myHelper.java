@@ -13,34 +13,64 @@ import java.util.Map;
  */
 public class myHelper {
 
-    public static void SetBadgeIcon(ImageView imageView, int badge){
+//    public static void SetBadgeIcon(ImageView imageView, int badge){
+//
+//        switch(badge){
+//            case 0:
+//                //star
+//                imageView.setImageResource(R.drawable.ic_star_black_36px);
+//                break;
+//            case 1:
+//                //constant improvement
+//                imageView.setImageResource(R.drawable.ic_arrow_upward_black_36px);
+//                break;
+//            case 2:
+//                //improvement
+//                imageView.setImageResource(R.drawable.ic_trending_up_black_36px);
+//                break;
+//            case 3:
+//                //no change
+//                imageView.setImageResource(R.drawable.ic_trending_flat_black_36px);
+//                break;
+//            case 4:
+//                //worsening
+//                imageView.setImageResource(R.drawable.ic_trending_down_black_36px);
+//                break;
+//            case 5:
+//                //constantly worsening
+//                imageView.setImageResource(R.drawable.ic_arrow_downward_black_36px);
+//                break;
+//        }
+//    }
 
-        switch(badge){
+    public static int GetBadgeIconDrawableId(int badge) {
+
+        int toReturn = 0;
+
+        switch (badge) {
             case 0:
                 //star
-                imageView.setImageResource(R.drawable.ic_star_black_36px);
-                break;
+                return R.drawable.ic_star_black_36px;
             case 1:
                 //constant improvement
-                imageView.setImageResource(R.drawable.ic_arrow_upward_black_36px);
-                break;
+                return R.drawable.ic_arrow_upward_black_36px;
             case 2:
                 //improvement
-                imageView.setImageResource(R.drawable.ic_trending_up_black_36px);
-                break;
+                return R.drawable.ic_trending_up_black_36px;
             case 3:
                 //no change
-                imageView.setImageResource(R.drawable.ic_trending_flat_black_36px);
-                break;
+                return R.drawable.ic_trending_flat_black_36px;
             case 4:
                 //worsening
-                imageView.setImageResource(R.drawable.ic_trending_down_black_36px);
-                break;
+                return R.drawable.ic_trending_down_black_36px;
             case 5:
                 //constantly worsening
-                imageView.setImageResource(R.drawable.ic_arrow_downward_black_36px);
-                break;
+                return R.drawable.ic_arrow_downward_black_36px;
+            default:
+                return 0;
         }
+
+
     }
 
     public static ArrayList<String> GetBadgeTitleAndDescription(int badge){

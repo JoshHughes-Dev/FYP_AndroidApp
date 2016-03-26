@@ -100,11 +100,11 @@ public class SaveDialogFragment extends DialogFragment{
         });
 
         TextView resultsDetailsView = (TextView) view.findViewById(R.id.save_dialog_results_details);
-        String resultsText = "Results: " + crimeLocationTypeModel.Name;
+        String resultsText = "Results: " +  Integer.toString(crimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)";
         resultsDetailsView.setText(resultsText);
 
         TextView typeDetailsView = (TextView) view.findViewById(R.id.save_dialog_type_details);
-        String typeText= "Type: " +Integer.toString(crimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)";
+        String typeText= "Type: " + crimeLocationTypeModel.Name;
         typeDetailsView.setText(typeText);
 
         return builder.create();

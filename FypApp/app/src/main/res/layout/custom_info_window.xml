@@ -15,7 +15,7 @@
         android:text="Location Title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:gravity="center"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/primary_text_light"/>
 
 
 
@@ -29,13 +29,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_window_badge_view"
-            android:contentDescription="Badge" />
+            android:contentDescription="Badge"
+            />
 
         <TextView
             android:paddingLeft="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_window_badge_text"
+            android:textColor="@android:color/secondary_text_light"
             android:text="badge text"/>
 
     </LinearLayout>
@@ -44,6 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/secondary_text_light"
             android:text="0 crime(s)"
             android:gravity="center"
             android:id="@+id/info_window_crime_number"/>
@@ -54,6 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/secondary_text_light"
         android:text="0 meters away"
         android:gravity="center"
         android:id="@+id/info_window_distance_view"/>

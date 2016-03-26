@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="2"
@@ -8,21 +9,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical">
+        android:minHeight="48dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:gravity="center">
 
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Crimes"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:text="Nearby Crimes"
+            android:textColor="@android:color/secondary_text_light"/>
 
-        <Button
+        <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="list/graph"
-            android:id="@+id/listGraph_toggleButton"
-            android:layout_gravity="center_horizontal" />
+            android:orientation="horizontal"
+            android:id="@+id/details_activity_panel_2_radio_group">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Graph"
+                android:checked="true"
+                android:id="@+id/details_activity_panel_2_graph_radio"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="List"
+
+                android:id="@+id/details_activity_panel_2_list_radio" />
+
+        </RadioGroup>
 
     </LinearLayout>
 
@@ -31,12 +50,14 @@
         android:name="com.example.joshuahughes.fypapp.fragments.CrimesListFragment"
         android:id="@+id/crimes_list_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_crimes_list" />
 
     <fragment
         android:name="com.example.joshuahughes.fypapp.fragments.CrimeGraphFragment"
         android:id="@+id/crimes_graph_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_crime_graph" />
 
 </LinearLayout>

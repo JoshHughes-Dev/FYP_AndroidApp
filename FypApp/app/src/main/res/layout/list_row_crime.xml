@@ -11,11 +11,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:id="@+id/list_row_crime_category"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/primary_text_light"
+        android:text="crime-type"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/list_row_crime_date"/>
+        android:id="@+id/list_row_crime_date"
+        android:text="Jan 2016"
+        android:textColor="@android:color/primary_text_light"/>
 
 </LinearLayout>

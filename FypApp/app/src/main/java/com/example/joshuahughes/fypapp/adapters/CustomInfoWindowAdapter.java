@@ -55,7 +55,8 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
             textView.setText(clm.Location.Name);
 
             ImageView badgeView = (ImageView) view.findViewById(R.id.info_window_badge_view);
-            myHelper.SetBadgeIcon(badgeView, clm.Badge);
+            badgeView.setImageResource(myHelper.GetBadgeIconDrawableId(clm.Badge));
+
 
             TextView badgeTextView = (TextView) view.findViewById(R.id.info_window_badge_text);
             String title = myHelper.GetBadgeTitleAndDescription(clm.Badge).get(0);

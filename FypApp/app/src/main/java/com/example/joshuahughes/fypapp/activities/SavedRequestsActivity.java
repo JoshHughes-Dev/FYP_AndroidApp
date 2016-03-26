@@ -35,6 +35,8 @@ public class SavedRequestsActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Saved Requests");
+
 
         if (savedInstanceState != null) {
             saveArrayModel = savedInstanceState.getParcelable("crimeLocationRequestModel");
@@ -45,8 +47,6 @@ public class SavedRequestsActivity extends BaseActivity {
             saveArrayModel = createSaveArrayModelObject(jsonString);
         }
 
-//        Log.d(TAG, Boolean.toString(saveArrayModel == null));
-//        Log.d(TAG, saveArrayModel.toString());
 
         if(saveArrayModel != null && saveArrayModel.SaveModels != null) {
             CreateListView(saveArrayModel.SaveModels);
@@ -79,8 +79,7 @@ public class SavedRequestsActivity extends BaseActivity {
     private SaveArrayModel createSaveArrayModelObject (String jsonObject){
 
         Gson gson = new Gson();
-        SaveArrayModel saveArrayModel = gson.fromJson(jsonObject, SaveArrayModel.class);
-        return saveArrayModel;
+        return gson.fromJson(jsonObject, SaveArrayModel.class);
     }
 
     protected void StartIntentToDetailsActivity(SaveModel saveModel){

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.joshuahughes.fypapp.R;
 import com.example.joshuahughes.fypapp.models.CrimeLocationModel;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -19,6 +20,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.DateFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -164,7 +166,6 @@ public class CrimeGraphFragment extends Fragment {
 
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graphView);
         staticLabelsFormatter.setHorizontalLabels(labels);
-
         graphView.getGridLabelRenderer().setNumHorizontalLabels(12);
         graphView.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 

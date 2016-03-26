@@ -2,6 +2,7 @@ package com.example.joshuahughes.fypapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -41,6 +43,7 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
     private CrimeLocationModel crimeLocationModel;
     private GoogleMap mMap;
     private TableLayout detailsTable;
+    RadioGroup radioGroup;
 
     private CrimesListFragment crimesListFragment;
     private CrimeGraphFragment crimesGraphFragment;
@@ -88,30 +91,39 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
 
         //populate details table
         detailsTable = (TableLayout) findViewById(R.id.tableLayout_details);
-        createRankDetailTableRow();
-        createCrimeDetailTableRow();
-        createBadgeDetailTableRow();
-        createDistanceDetailTableRow();
+
+
+        //rank
+        String rankPrimaryText = "Rank " + Integer.toString(crimeLocationModel.Rank);
+        String rankSecondaryText = "of " + numberOfLocationResults + " results";
+        CreateDetailsRow(rankPrimaryText, rankSecondaryText, R.drawable.ic_format_list_numbered_24dp);
+
+        //Crime
+        String crimePrimaryText = Integer.toString(crimeLocationModel.Crimes.size())  + " crime(s) recorded";
+        String crimeSecondaryText = "in the past 12 months";
+        CreateDetailsRow(crimePrimaryText,crimeSecondaryText, R.drawable.ic_assessment_24dp);
+
+        //Badge
+        ArrayList<String> arrayList = myHelper.GetBadgeTitleAndDescription(crimeLocationModel.Badge);
+        CreateDetailsRow(arrayList.get(0), arrayList.get(1), myHelper.GetBadgeIconDrawableId(crimeLocationModel.Badge));
+
+        //Distance
+        String distancePrimaryText = Integer.toString(crimeLocationModel.Distance) + " meters";
+        String distanceSecondaryText = "from starting search point";
+        CreateDetailsRow(distancePrimaryText,distanceSecondaryText, R.drawable.ic_pin_drop_24dp);
+
 
         //create crimes list fragment
         crimesListFragment = (CrimesListFragment) getSupportFragmentManager().findFragmentById(R.id.crimes_list_fragment);
         crimesGraphFragment = (CrimeGraphFragment) getSupportFragmentManager().findFragmentById(R.id.crimes_graph_fragment);
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if(listOpen){
-            ft.hide(crimesGraphFragment);
-        }
-        else{
-            ft.hide(crimesListFragment);
-        }
-        ft.commit();
-
-
-        Button toggleButton = (Button) findViewById(R.id.listGraph_toggleButton);
-        toggleButton.setOnClickListener(new View.OnClickListener() {
+        //controls
+        radioGroup = (RadioGroup) findViewById(R.id.details_activity_panel_2_radio_group);
+        SetGraphListView(radioGroup.getCheckedRadioButtonId());
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                ToggleGraphListView();
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                SetGraphListView(checkedId);
             }
         });
     }
@@ -161,80 +173,21 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
 
     //--------------------------------------------------------------------------------------------//
 
-    /**
-     * Populates rank details row
-     */
-    private void createRankDetailTableRow(){
+
+    private void CreateDetailsRow(String primaryText, String secondaryText, int iconId){
 
         View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
 
-        TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        String detailText = "Rank " + Integer.toString(crimeLocationModel.Rank);
-        detailView.setText(detailText);
-
-        TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        String detailSubText = "...of " + numberOfLocationResults + " results";
-        detailSubView.setText(detailSubText);
-
-        detailsTable.addView(tr);
-    }
-
-    /**
-     * Populates crimes details row
-     */
-    private void createCrimeDetailTableRow(){
-
-        View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
+        if(iconId > 0){
+            ImageView iconView = (ImageView) tr.findViewById(R.id.table_row_icon);
+            iconView.setImageResource(iconId);
+        }
 
         TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        String detailText = Integer.toString(crimeLocationModel.Crimes.size())  + " crime(s) recorded";
-        detailView.setText(detailText);
+        detailView.setText(primaryText);
 
         TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        String detailSubText = "..in the past 12 months";
-        detailSubView.setText(detailSubText);
-
-        detailsTable.addView(tr);
-    }
-
-    /**
-     * Populates Badge details row
-     */
-    private void createBadgeDetailTableRow(){
-
-        View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
-
-        ImageView iconView = (ImageView) tr.findViewById(R.id.table_row_icon);
-        myHelper.SetBadgeIcon(iconView, crimeLocationModel.Badge);
-
-        ArrayList<String> arrayList = myHelper.GetBadgeTitleAndDescription(crimeLocationModel.Badge);
-
-        TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        detailView.setText(arrayList.get(0));
-
-        TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        detailSubView.setText(arrayList.get(1));
-
-        detailsTable.addView(tr);
-    }
-
-    /**
-     * Populates distance details row
-     */
-    private void createDistanceDetailTableRow(){
-
-        View tr = getLayoutInflater().inflate(R.layout.tablerow_details_item, null, false);
-
-        ImageView iconView = (ImageView) tr.findViewById(R.id.table_row_icon);
-        iconView.setImageResource(R.drawable.ic_pin_drop_24dp);
-
-        TextView detailView = (TextView)tr.findViewById(R.id.table_row_detail);
-        String detailText = Integer.toString(crimeLocationModel.Distance) + " meters";
-        detailView.setText(detailText);
-
-        TextView detailSubView = (TextView)tr.findViewById(R.id.table_row_subDetail);
-        String detailSubText = "...from starting search point";
-        detailSubView.setText(detailSubText);
+        detailSubView.setText(secondaryText);
 
         detailsTable.addView(tr);
     }
@@ -257,6 +210,30 @@ public class DetailsActivity extends BaseActivity implements OnMapReadyCallback,
             ft.hide(crimesGraphFragment);
             ft.show(crimesListFragment);
             listOpen = true;
+        }
+
+        ft.commit();
+    }
+
+    private void SetGraphListView(int checkedId){
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        switch(checkedId){
+            case R.id.details_activity_panel_2_graph_radio:
+                //change to graph
+                ft.show(crimesGraphFragment);
+                ft.hide(crimesListFragment);
+                //listOpen = false;
+                break;
+            case R.id.details_activity_panel_2_list_radio:
+                //change to map view
+                ft.hide(crimesGraphFragment);
+                ft.show(crimesListFragment);
+                break;
+            default:
+                //Todo
+                break;
         }
 
         ft.commit();

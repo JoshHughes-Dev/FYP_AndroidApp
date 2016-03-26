@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.joshuahughes.fypapp.R;
@@ -18,8 +19,10 @@ import com.example.joshuahughes.fypapp.activities.SavedRequestsActivity;
 import com.example.joshuahughes.fypapp.models.SaveModel;
 
 
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by joshuahughes on 23/03/2016.
@@ -48,7 +51,8 @@ public class SaveModelsAdapter extends ArrayAdapter<SaveModel> {
         nameView.setText(model.Name);
 
         TextView dateView = (TextView) rowView.findViewById(R.id.list_row_save_model_date);
-        dateView.setText(model.SaveDate.toString());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy h:mm a", Locale.UK);
+        dateView.setText(simpleDateFormat.format(model.SaveDate));
 
         TextView crimeTypeView = (TextView) rowView.findViewById(R.id.list_row_save_model_crime_type);
         crimeTypeView.setText(model.CrimeLocationTypeModel.Name);
@@ -56,7 +60,7 @@ public class SaveModelsAdapter extends ArrayAdapter<SaveModel> {
         TextView crimesView = (TextView) rowView.findViewById(R.id.list_row_save_model_crimes);
         crimesView.setText(Integer.toString(model.CrimeLocationsRequestModel.CrimeLocations.size()) + " crime(s)");
 
-        Button button = (Button) rowView.findViewById(R.id.list_row_save_model_delete_button);
+        ImageButton button = (ImageButton) rowView.findViewById(R.id.list_row_save_model_delete_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

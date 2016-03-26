@@ -17,20 +17,12 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:id="@+id/saved_requests_list_title_layout">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Current Saved Requests"
-            android:id="@+id/saved_requests_list_title">
-        </TextView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="press any save to load into map view"
-            android:layout_below="@+id/saved_requests_list_title"
+            android:text="Press any saved reques to load into map view"
             android:id="@+id/saved_requests_list_sub_title">
         </TextView>
     </RelativeLayout>
