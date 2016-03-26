@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:paddingRight="8dp"
+    android:gravity="center">
 
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/locationTitle"
         android:text="Location Title"
@@ -20,7 +21,7 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
@@ -43,7 +44,7 @@
     </LinearLayout>
 
     <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/secondary_text_light"
@@ -52,9 +53,8 @@
             android:id="@+id/info_window_crime_number"/>
 
 
-
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/secondary_text_light"
@@ -65,7 +65,7 @@
 
     <TextView
         android:layout_marginTop="8dp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/click_for_details"
