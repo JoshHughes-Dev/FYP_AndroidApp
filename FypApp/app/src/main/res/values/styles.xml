@@ -23,5 +23,7 @@
         <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
+    <style name="TestTheme" parent="AppTheme" />
+
 
 </resources>
