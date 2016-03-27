@@ -183,7 +183,8 @@ public class CrimeGraphFragment extends Fragment {
         ArrayList<Integer> timePeriodList = new ArrayList<>();
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        //months are 1-12 (calendar returns 0-11, just adding one to convert)
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
 
         int previousYear = currentYear - 1;
 
