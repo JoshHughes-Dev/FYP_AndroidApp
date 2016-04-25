@@ -162,7 +162,7 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                 break;
 
             case R.id.clearResults:
-                if(crimeLocationsRequestModel != null){
+                if(crimeLocationsRequestModel != null || mapInputFragment.selectedLocation != null){
                     CreateClearResultsDialog();
                 }
                 else{
@@ -357,6 +357,12 @@ public class MapSearchActivity extends BaseActivity implements MapInputFragment.
                         crimeLocationsRequestModel.SetRankForResults();
                         SendMapInputResults();
                         SendListViewResults();
+
+                        if(crimeLocationsRequestModel.Status.Errors.size() > 0){
+                            Log.d(TAG, crimeLocationsRequestModel.Status.Errors.get(0).toString());
+                            //fix for errors complication...
+                            crimeLocationsRequestModel.Status.Errors.clear();
+                        }
                     }
                 },
                 new Response.ErrorListener() {

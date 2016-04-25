@@ -64,6 +64,7 @@ public class DashBoardActivity extends BaseActivity {
         Intent intent = getIntent();
         if(intent.hasExtra(getString(R.string.intent_start_up_update))){
             StartUpUpdateToast(intent.getExtras().getBoolean(getString(R.string.intent_start_up_update)));
+            intent.removeExtra(getString(R.string.intent_start_up_update));
 
             if(intent.hasExtra(getString(R.string.intent_start_up_error))){
                 VolleyError error = intent.getExtras().getParcelable(getString(R.string.intent_start_up_error));

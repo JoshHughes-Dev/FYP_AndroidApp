@@ -17,6 +17,19 @@
     <string name="click_for_details"><u>click for details</u></string>
     <string name="start_up_loading_text">Retrieving updates from server&#8230;</string>
     <string name="map_input_seek_bar_title">Search radius:</string>
+    <string name="about_info_text">This application is part of a student Final Year Project. It allows you to search for location-based crime data.</string>
+    <string name="about_instructions_text">
+        To use the app, first select a crime-location relationship to use as a basis for a search.
+        This means you will be search for certain types of crimes in the vicinity of certain locations.
+        This will take you to a map view. Pressing on the map will create a search for location based crime data.
+        Results can be view on the map or in a list by toggling map/list view button in the navigation bar. Locations are comparatively ranked.
+        Selecting a location opens a details view. A save feature is also available to store search results.
+    </string>
+    <string name="about_crime_badge_desc">
+        Each location is given an icon which represents a "crime badge".
+        This badge represents information about the crime rates over time at that location.
+        Each badge is explained below.
+    </string>
     <!-- /Views -->
 
 

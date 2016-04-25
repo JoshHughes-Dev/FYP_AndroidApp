@@ -482,6 +482,7 @@ public class MapInputFragment extends Fragment implements OnMapReadyCallback, Go
             //TODO better no internet message
             Toast toast = Toast.makeText(getActivity(), R.string.no_search_without_internet_toast_message, Toast.LENGTH_SHORT);
             toast.show();
+
         }
     }
 

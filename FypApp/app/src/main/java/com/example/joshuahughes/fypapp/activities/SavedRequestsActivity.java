@@ -26,6 +26,7 @@ public class SavedRequestsActivity extends BaseActivity {
     protected SaveModelsAdapter saveModelsAdapter;
 
     private static final String TAG = "SavedRequestsActivity";
+    private static final String STATE_SAVE_ARRAY = "saveArrayModel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,8 @@ public class SavedRequestsActivity extends BaseActivity {
 
 
         if (savedInstanceState != null) {
-            saveArrayModel = savedInstanceState.getParcelable("crimeLocationRequestModel");
-            Log.d("SavedRequestsActivity", "loaded data from save instance");
+            saveArrayModel = savedInstanceState.getParcelable(STATE_SAVE_ARRAY);
+            Log.d(TAG, "loaded data from save instance");
         }
         else{
             String jsonString = StorageHelper.RetrieveSaveArrayModelJSON(this).toString();
@@ -75,6 +76,14 @@ public class SavedRequestsActivity extends BaseActivity {
 
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        //save crime location types array list
+        savedInstanceState.putParcelable(STATE_SAVE_ARRAY, saveArrayModel);
+    }
+
 
     private SaveArrayModel createSaveArrayModelObject (String jsonObject){
 

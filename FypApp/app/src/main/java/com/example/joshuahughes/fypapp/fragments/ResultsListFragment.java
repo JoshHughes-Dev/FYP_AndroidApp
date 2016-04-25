@@ -222,8 +222,10 @@ public class ResultsListFragment extends Fragment  {
      * Public to allow parent acitivty to call it
      */
     public void ClearResults(){
-        requestModel.CrimeLocations.clear();
-        clAdapter.notifyDataSetChanged();
+        if(requestModel != null){
+            requestModel.CrimeLocations.clear();
+            clAdapter.notifyDataSetChanged();
+        }
         requestModel = null;
         noResultsTextView.setVisibility(View.VISIBLE);
     }
