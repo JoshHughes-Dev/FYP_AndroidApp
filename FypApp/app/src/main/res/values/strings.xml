@@ -73,20 +73,12 @@
     <!-- /Intent Extras -->
 
     <!-- FYP API -->
-    <string name="baseUrl">https://co-web-1.lboro.ac.uk/cojh5web/api</string>
+    <string name="baseUrl">http://www.crimelocation.co.uk/api</string>
     <string name="crimeLocationTypesCall">/crimelocation</string>
     <!-- /FYP API -->
 
     <!-- GOOGLE -->
     <string name="google_app_id">471501874384</string>
     <!-- /GOOGLE -->
-
-
-
-
-
-
-
-
 
 </resources>

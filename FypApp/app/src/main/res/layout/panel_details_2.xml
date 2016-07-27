@@ -48,14 +48,14 @@
 
 
     <fragment
-        android:name="com.example.joshuahughes.fypapp.fragments.CrimesListFragment"
+        android:name="org.crimelocation.fypapp.fragments.CrimesListFragment"
         android:id="@+id/crimes_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_crimes_list" />
 
     <fragment
-        android:name="com.example.joshuahughes.fypapp.fragments.CrimeGraphFragment"
+        android:name="org.crimelocation.fypapp.fragments.CrimeGraphFragment"
         android:id="@+id/crimes_graph_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

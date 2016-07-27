@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.joshuahughes.fypapp">
+    package="org.crimelocation.fypapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activities.StartUpActivity"
+            android:name="org.crimelocation.fypapp.activities.StartUpActivity"
             android:theme="@style/SplashTheme">
             android:configChanges="orientation|keyboardHidden"
             <intent-filter>
@@ -26,38 +26,38 @@
         </activity>
 
         <activity
-            android:name=".activities.DashBoardActivity"
+            android:name="org.crimelocation.fypapp.activities.DashBoardActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_dash_board"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.AboutActivity"
+            android:name="org.crimelocation.fypapp.activities.AboutActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.SavedRequestsActivity"
+            android:name="org.crimelocation.fypapp.activities.SavedRequestsActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_saved_requests"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.BaseActivity" />
+        <activity android:name="org.crimelocation.fypapp.activities.BaseActivity" />
         <activity
-            android:name=".activities.MapSearchActivity"
+            android:name="org.crimelocation.fypapp.activities.MapSearchActivity"
             android:label="@string/title_activity_map_search"
-            android:parentActivityName=".activities.DashBoardActivity"
+            android:parentActivityName="org.crimelocation.fypapp.activities.DashBoardActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.joshuahughes.fypapp.activities.DashBoardActivity" />
+                android:value="org.crimelocation.fypapp.activities.DashBoardActivity" />
         </activity>
         <activity
-            android:name=".activities.DetailsActivity"
+            android:name="org.crimelocation.fypapp.activities.DetailsActivity"
             android:label="@string/title_activity_details"
-            android:parentActivityName=".activities.MapSearchActivity"
+            android:parentActivityName="org.crimelocation.fypapp.activities.MapSearchActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.joshuahughes.fypapp.activities.MapSearchActivity" />
+                android:value="org.crimelocation.fypapp.activities.MapSearchActivity" />
         </activity>
 
 

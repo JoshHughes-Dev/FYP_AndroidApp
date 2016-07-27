@@ -7,7 +7,7 @@
     android:paddingRight="24dp"
     android:paddingBottom="24dp"
     android:orientation="vertical"
-    tools:context="com.example.joshuahughes.fypapp.fragments.SaveDialogFragment">
+    tools:context="org.crimelocation.fypapp.fragments.SaveDialogFragment">
 
 
     <EditText
